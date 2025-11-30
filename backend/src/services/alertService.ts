@@ -1,6 +1,7 @@
 import { AlertLevel, EmotionType } from '../types';
 import EmotionRecord from '../models/EmotionRecord';
-import Alert from '../models/Alert';
+import Alert, { IAlert } from '../models/Alert';
+import mongoose from 'mongoose';
 
 // 预警规则配置
 const ALERT_RULES = {
@@ -26,7 +27,7 @@ const ALERT_RULES = {
 };
 
 // 检查是否需要生成预警
-export const checkAlert = async (userId: string): Promise<Alert | null> => {
+export const checkAlert = async (userId: string): Promise<IAlert | null> => {
   try {
     // 获取用户最近7天的情绪记录
     const sevenDaysAgo = new Date();
@@ -106,12 +107,13 @@ export const checkAlert = async (userId: string): Promise<Alert | null> => {
       }
       
       // 创建新预警
-      const alert = new Alert({
-        studentId: userId,
-        level: alertLevel,
-        reason: alertReason,
-        description: `学生最近情绪状态异常，建议关注。最近一次情绪：${latestEmotion.emotion}（得分：${latestEmotion.score}）`
-      });
+        const alert = new Alert({
+          _id: new mongoose.Types.ObjectId(),
+          studentId: userId,
+          level: alertLevel,
+          reason: alertReason,
+          description: `学生最近情绪状态异常，建议关注。最近一次情绪：${latestEmotion.emotion}（得分：${latestEmotion.score}）`
+        });
       
       await alert.save();
       return alert;
@@ -125,7 +127,7 @@ export const checkAlert = async (userId: string): Promise<Alert | null> => {
 };
 
 // 生成预警
-export const generateAlert = async (userId: string, level: AlertLevel, reason: string, description?: string): Promise<Alert> => {
+export const generateAlert = async (userId: string, level: AlertLevel, reason: string, description?: string): Promise<IAlert> => {
   try {
     const alert = new Alert({
       studentId: userId,
@@ -143,7 +145,7 @@ export const generateAlert = async (userId: string, level: AlertLevel, reason: s
 };
 
 // 处理预警
-export const handleAlert = async (alertId: string, handledBy: string, handledNote?: string): Promise<Alert> => {
+export const handleAlert = async (alertId: string, handledBy: string, handledNote?: string): Promise<IAlert> => {
   try {
     const alert = await Alert.findByIdAndUpdate(
       alertId,

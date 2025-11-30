@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import EmotionRecord from '../models/EmotionRecord';
-import { recognizeEmotion } from '../services/emotionRecognitionService';
+import { recognizeEmotion, recognizeTextEmotion } from '../services/emotionRecognitionService';
 import { checkAlert } from '../services/alertService';
-import { RecognitionType } from '../types';
+import { RecognitionType, EmotionType } from '../types';
 
 // 创建情绪记录
 export const createEmotionRecord = async (req: Request, res: Response): Promise<void> => {
@@ -181,5 +181,45 @@ export const getEmotionStatistics = async (req: Request, res: Response): Promise
   } catch (error) {
     console.error('获取情绪统计失败:', error);
     res.status(500).json({ message: '获取情绪统计失败', error });
+  }
+};
+
+// 分析情绪（无需身份验证，用于前端直接分析）
+export const analyzeEmotion = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { text } = req.body;
+
+    if (!text || !text.trim()) {
+      res.status(400).json({ message: '文本内容不能为空' });
+      return;
+    }
+
+    // 调用文本情绪识别服务
+    const result = await recognizeTextEmotion(text);
+
+    // 生成建议
+    const getSuggestion = (emotion: string): string => {
+      const suggestions: Record<string, string> = {
+        [EmotionType.HAPPY]: '保持好心情，继续享受生活！',
+        [EmotionType.SAD]: '不要难过，一切都会好起来的。可以尝试做一些自己喜欢的事情。',
+        [EmotionType.ANGRY]: '深呼吸，冷静一下。生气解决不了问题，试着换个角度看事情。',
+        [EmotionType.ANXIOUS]: '放松心情，不要给自己太大压力。可以尝试冥想或运动来缓解焦虑。',
+        [EmotionType.FEARFUL]: '不要害怕，面对恐惧是克服它的第一步。',
+        [EmotionType.SURPRISED]: '生活充满惊喜，享受每一个瞬间！',
+        [EmotionType.NEUTRAL]: '保持平和的心态，也是一种很好的状态。'
+      };
+      return suggestions[emotion] || '保持积极乐观的心态！';
+    };
+
+    // 返回符合前端期望格式的响应
+    res.status(200).json({
+      emotion: result.emotion,
+      confidence: result.score / 100,
+      suggestion: getSuggestion(result.emotion),
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('情绪分析失败:', error);
+    res.status(500).json({ message: '情绪分析失败', error });
   }
 };

@@ -5,7 +5,8 @@ import {
   getEmotionRecords,
   getEmotionRecordById,
   deleteEmotionRecord,
-  getEmotionStatistics
+  getEmotionStatistics,
+  analyzeEmotion
 } from '../controllers/emotionController';
 
 const router = express.Router();
@@ -24,5 +25,8 @@ router.delete('/:id', authenticate, isStudent, deleteEmotionRecord);
 
 // 获取用户情绪统计（仅学生或教师/管理员查看指定学生）
 router.get('/statistics', authenticate, getEmotionStatistics);
+
+// 分析情绪（无需身份验证，用于前端直接分析）
+router.post('/analyze', analyzeEmotion);
 
 export default router;
