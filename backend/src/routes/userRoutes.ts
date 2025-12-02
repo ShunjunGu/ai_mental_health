@@ -5,7 +5,8 @@ import {
   loginUser,
   getCurrentUser,
   updateUser,
-  changePassword
+  changePassword,
+  getAllUsers
 } from '../controllers/userController';
 
 const router = express.Router();
@@ -24,5 +25,8 @@ router.put('/me', authenticate, updateUser);
 
 // 更改密码（需要认证）
 router.put('/change-password', authenticate, changePassword);
+
+// 临时端点：获取所有用户（仅用于调试，不需要认证）
+router.get('/all', getAllUsers);
 
 export default router;

@@ -45,6 +45,12 @@ const emotionTrainingData = [
     { text: '你怎么可以这样对我？太过分了！', intent: 'angry', entities: [], sentiment: -0.9 },
     { text: '一对A碍着你了？上来就开骂？你妈和你爸也是畜生生了你这么个小畜生出来？和别人说教养你怎么不先擦擦你那个吃屎的嘴？好意思教别人怎么做人？', intent: 'angry', entities: [], sentiment: -1.0 },
     { text: '我讨厌你，你太让我生气了', intent: 'angry', entities: [], sentiment: -0.8 },
+    { text: '你是不是父母死光了，跑到这里找存在感。', intent: 'angry', entities: [], sentiment: -1.0 },
+    { text: '你妈死了，你还在这里笑！', intent: 'angry', entities: [], sentiment: -1.0 },
+    { text: '你爸是怎么教你的？一点教养都没有！', intent: 'angry', entities: [], sentiment: -0.9 },
+    { text: '你这种人就该去死，活着浪费空气！', intent: 'angry', entities: [], sentiment: -1.0 },
+    { text: '滚蛋，别在这里丢人现眼！', intent: 'angry', entities: [], sentiment: -0.9 },
+    { text: '你是不是脑子有问题？傻逼！', intent: 'angry', entities: [], sentiment: -0.95 },
     
     // 焦虑情绪训练数据
     { text: '我很紧张，担心明天的面试', intent: 'anxious', entities: [], sentiment: -0.6 },
@@ -128,13 +134,18 @@ const calculateEmotionScore = (sentiment: number, confidence: number): number =>
 
 // 文本情绪识别
 export const recognizeTextEmotion = async (text: string): Promise<{ emotion: EmotionType; score: number; additionalEmotions: { [key in EmotionType]: number } }> => {
+    // 确保模型已训练
+    await trainModel();
+    
     // 调试信息：输出接收到的文本及其编码信息
     console.log('识别文本情绪 - 原始文本:', text);
     console.log('文本长度:', text.length);
     console.log('文本字符编码:', Array.from(text).map(char => char.charCodeAt(0)));
     
-    // 确保模型已训练
-    await trainModel();
+    // 使用NLP模型进行情绪识别
+    const result = await manager.process('zh', text);
+    
+    console.log('NLP模型识别结果:', result);
     
     // 初始化情绪分数
     const emotionScores: { [key in EmotionType]: number } = {
@@ -144,180 +155,38 @@ export const recognizeTextEmotion = async (text: string): Promise<{ emotion: Emo
         [EmotionType.ANXIOUS]: 0,
         [EmotionType.FEARFUL]: 0,
         [EmotionType.SURPRISED]: 0,
-        [EmotionType.NEUTRAL]: 70 // 中性情绪默认分数提高，避免短文本被错误分类
+        [EmotionType.NEUTRAL]: 0
     };
     
-    // 特殊处理常见问候语和短文本
-    const commonGreetings = ['你好', '您好', '早上好', '下午好', '晚上好', '再见', '谢谢', '不客气', '是的', '不是', '好的', '嗯'];
-    if (text.length <= 5 && commonGreetings.includes(text)) {
-        console.log('识别到常见问候语或短文本，直接分类为中性情绪');
-        emotionScores[EmotionType.NEUTRAL] = 90; // 高置信度的中性情绪
-        
-        return {
-            emotion: EmotionType.NEUTRAL,
-            score: 90,
-            additionalEmotions: emotionScores
-        };
-    }
+    // 获取识别结果
+    const intent = result.intent || 'neutral';
+    const sentiment = result.sentiment?.score || 0;
+    const confidence = result.score || 0;
     
-    try {
-        // 使用NLP进行情绪分析
-        console.log('使用NLP模型进行情绪分析...');
-        const result = await manager.process('zh', text);
-        
-        console.log('NLP分析结果:', {
-            intent: result.intent,
-            sentiment: result.sentiment.score,
-            score: result.score,
-            entities: result.entities,
-            classifications: result.classifications
-        });
-        
-        // 获取检测到的情绪和得分
-        const detectedIntent = result.intent || 'neutral';
-        const sentiment = result.sentiment.score;
-        const confidence = result.score;
-        
-        // 映射到我们的情绪类型
-        const detectedEmotion = intentToEmotionType[detectedIntent] || EmotionType.NEUTRAL;
-        
-        // 计算情绪得分
-        const emotionScore = calculateEmotionScore(sentiment, confidence);
-        emotionScores[detectedEmotion] = emotionScore;
-        
-        // 对于短文本（长度小于等于5），增加中性情绪的权重，降低误判概率
-        if (text.length <= 5) {
-            console.log('检测到短文本，增加中性情绪权重');
-            emotionScores[EmotionType.NEUTRAL] = Math.max(emotionScores[EmotionType.NEUTRAL], 60 + (confidence * 10));
-        }
-        
-        // 如果置信度较低，考虑其他可能的情绪分类
-        if (confidence < 0.6 && result.classifications && result.classifications.length > 1) {
-            result.classifications.forEach((classification: any) => {
-                if (classification.intent !== detectedIntent && classification.score > 0.3) {
-                    const otherEmotion = intentToEmotionType[classification.intent] || EmotionType.NEUTRAL;
-                    const otherScore = calculateEmotionScore(
-                        sentiment * (classification.score / confidence), 
-                        classification.score
-                    );
-                    emotionScores[otherEmotion] = Math.max(emotionScores[otherEmotion], otherScore);
-                }
-            });
-        }
-        
-        // 对于有明确情感倾向但意图识别不准确的情况进行调整
-        if (Math.abs(sentiment) > 0.7 && confidence < 0.5) {
-            if (sentiment > 0) {
-                // 强烈的正面情感，应偏向高兴
-                emotionScores[EmotionType.HAPPY] = Math.max(emotionScores[EmotionType.HAPPY], 80);
-            } else {
-                // 强烈的负面情感，根据文本内容判断具体情绪
-                const angryKeywords = ['骂', '畜生', '生气', '愤怒', '恼火', '气愤', '讨厌'];
-                const sadKeywords = ['难过', '悲伤', '伤心', '沮丧', '失落', '痛苦'];
-                const anxiousKeywords = ['焦虑', '紧张', '担忧', '担心'];
-                const fearfulKeywords = ['恐惧', '害怕', '恐怖', '惊恐'];
-                
-                // 检查文本中是否包含特定情绪的关键词
-                if (angryKeywords.some(keyword => text.includes(keyword))) {
-                    emotionScores[EmotionType.ANGRY] = Math.max(emotionScores[EmotionType.ANGRY], 85);
-                } else if (sadKeywords.some(keyword => text.includes(keyword))) {
-                    emotionScores[EmotionType.SAD] = Math.max(emotionScores[EmotionType.SAD], 80);
-                } else if (anxiousKeywords.some(keyword => text.includes(keyword))) {
-                    emotionScores[EmotionType.ANXIOUS] = Math.max(emotionScores[EmotionType.ANXIOUS], 75);
-                } else if (fearfulKeywords.some(keyword => text.includes(keyword))) {
-                    emotionScores[EmotionType.FEARFUL] = Math.max(emotionScores[EmotionType.FEARFUL], 75);
-                }
-            }
-        }
-        
-        // 找出得分最高的情绪
-        let maxScore = 70; // 提高默认最高分，优先选择中性情绪
-        let finalEmotion = EmotionType.NEUTRAL;
-        
-        Object.entries(emotionScores).forEach(([emotion, score]) => {
-            if (score > maxScore) {
-                maxScore = score;
-                finalEmotion = emotion as EmotionType;
-            }
-        });
-        
-        console.log('情绪分析结果:', {
-            text: text,
-            emotion: finalEmotion,
-            score: maxScore,
-            additionalEmotions: emotionScores
-        });
-        
-        return {
-            emotion: finalEmotion,
-            score: maxScore,
-            additionalEmotions: emotionScores
-        };
-        
-    } catch (error) {
-        console.error('NLP情绪分析出错:', error);
-        
-        // 错误情况下，使用简单的关键词匹配作为 fallback
-        console.log('使用备用关键词匹配方法进行情绪分析...');
-        
-        // 基本情绪关键词
-        const basicKeywords: Record<EmotionType, string[]> = {
-            [EmotionType.HAPPY]: ['开心', '快乐', '高兴', '愉快', '兴奋', '满足', '幸福', '好', '不错', '棒'],
-            [EmotionType.SAD]: ['难过', '悲伤', '伤心', '沮丧', '失落', '痛苦'],
-            [EmotionType.ANGRY]: ['愤怒', '生气', '恼火', '暴怒', '气愤', '讨厌', '骂', '畜生'],
-            [EmotionType.ANXIOUS]: ['焦虑', '紧张', '担忧', '担心', '不安'],
-            [EmotionType.FEARFUL]: ['恐惧', '害怕', '恐怖', '惊恐', '畏惧'],
-            [EmotionType.SURPRISED]: ['惊讶', '震惊', '吃惊', '意外'],
-            [EmotionType.NEUTRAL]: ['你好', '您好', '早上好', '下午好', '晚上好', '再见', '谢谢', '不客气', '是的', '不是', '好的', '嗯']
-        };
-        
-        let maxKeywordCount = 0;
-        let fallbackEmotion = EmotionType.NEUTRAL;
-        
-        // 优先检查中性情绪的关键词，特别是短文本
-        if (text.length <= 5) {
-            const neutralCount = basicKeywords[EmotionType.NEUTRAL].filter(keyword => text.includes(keyword)).length;
-            if (neutralCount > 0) {
-                maxKeywordCount = neutralCount;
-                fallbackEmotion = EmotionType.NEUTRAL;
-                emotionScores[EmotionType.NEUTRAL] = 90;
-            }
-        }
-        
-        // 检查其他情绪关键词
-        if (maxKeywordCount === 0) {
-            Object.entries(basicKeywords).forEach(([emotion, keywords]) => {
-                if (emotion === EmotionType.NEUTRAL) return; // 已经检查过了
-                
-                const emotionType = emotion as EmotionType;
-                const count = keywords.filter(keyword => text.includes(keyword)).length;
-                
-                if (count > maxKeywordCount) {
-                    maxKeywordCount = count;
-                    fallbackEmotion = emotionType;
-                }
-                
-                if (count > 0) {
-                    emotionScores[emotionType] = 60 + (count * 10);
-                }
-            });
-        }
-        
-        const fallbackScore = maxKeywordCount > 0 ? 60 + (maxKeywordCount * 10) : 70; // 提高默认分数
-        
-        console.log('Fallback情绪分析结果:', {
-            text: text,
-            emotion: fallbackEmotion,
-            score: fallbackScore,
-            additionalEmotions: emotionScores
-        });
-        
-        return {
-            emotion: fallbackEmotion,
-            score: fallbackScore,
-            additionalEmotions: emotionScores
-        };
-    }
+    // 映射意图到情绪类型
+    const finalEmotion = intentToEmotionType[intent] || EmotionType.NEUTRAL;
+    
+    // 计算情绪得分
+    const maxScore = calculateEmotionScore(sentiment, confidence);
+    
+    // 确保情绪得分正确设置
+    emotionScores[finalEmotion] = maxScore;
+    
+    console.log('情绪分析结果:', {
+        text: text,
+        emotion: finalEmotion,
+        score: maxScore,
+        additionalEmotions: emotionScores,
+        intent: intent,
+        sentiment: sentiment,
+        confidence: confidence
+    });
+    
+    return {
+        emotion: finalEmotion,
+        score: maxScore,
+        additionalEmotions: emotionScores
+    };
 };
 
 // 语音情绪识别
@@ -418,5 +287,6 @@ export const recognizeEmotion = async (
   }
 };
 
-// 初始化时预训练模型
-trainModel().catch(console.error);
+// 导出模型训练函数，以便在需要时调用
+export { trainModel };
+// 移除自动训练，改为在需要时手动调用

@@ -1,8 +1,8 @@
 import React, { useState, useContext } from 'react'
 import { Card, Input, Button, Typography, Result, Tag, Space } from 'antd'
 import { SendOutlined, LoadingOutlined } from '@ant-design/icons'
-import axios from 'axios'
 import { EmotionContext, emotionToColors } from '../App'
+import { emotionService } from '../services/emotionService'
 
 const { TextArea } = Input
 const { Title, Paragraph } = Typography
@@ -37,15 +37,15 @@ const EmotionRecognition: React.FC = () => {
     setResult(null)
 
     try {
-      // 使用当前运行的后端端口
-      const response = await axios.post('http://localhost:49740/api/emotions/analyze', {
-        text
-      })
-      setResult(response.data)
+      // 使用emotionService调用API（使用无需认证的端点）
+      const data = await emotionService.analyzeTextEmotion(text.trim())
+      setResult(data)
       // 更新全局情绪状态，改变页面背景颜色
-      setEmotion(response.data.emotion)
+      console.log('Setting emotion to:', data.emotion);
+      setEmotion(data.emotion)
     } catch (err) {
-      setError('情绪分析失败，请稍后重试')
+      // 使用更友好的错误信息
+      setError('分析失败，请稍后重试')
       console.error('Emotion analysis error:', err)
     } finally {
       setLoading(false)
@@ -100,9 +100,7 @@ const EmotionRecognition: React.FC = () => {
               background: 'rgba(255, 255, 255, 0.9)',
               transition: 'border-color 0.3s ease'
             }}
-            placeholderStyle={{
-              color: `${getCurrentColors().text}80` // 80是透明度，十六进制
-            }}
+
           />
         </div>
         <Button

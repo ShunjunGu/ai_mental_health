@@ -1,0 +1,230 @@
+[
+  {
+    "_id": "emotion_1764650928431_823",
+    "userId": "user_3",
+    "type": "text",
+    "content": "你是不是父母死光了，跑到这里找存在感。",
+    "emotion": "angry",
+    "score": 80,
+    "additionalEmotions": {
+      "happy": 0,
+      "sad": 0,
+      "angry": 80,
+      "anxious": 0,
+      "fearful": 0,
+      "surprised": 0,
+      "neutral": 0
+    },
+    "createdAt": "2025-12-02T04:48:48.431Z",
+    "updatedAt": "2025-12-02T04:48:48.431Z"
+  },
+  {
+    "_id": "emotion_1764664598011_841",
+    "userId": "public_user",
+    "type": "text",
+    "content": "你是不是父母死光了，跑到这里找存在感。",
+    "emotion": "angry",
+    "score": 80,
+    "additionalEmotions": {
+      "happy": 0,
+      "sad": 0,
+      "angry": 80,
+      "anxious": 0,
+      "fearful": 0,
+      "surprised": 0,
+      "neutral": 0
+    },
+    "createdAt": "2025-12-02T08:36:38.011Z",
+    "updatedAt": "2025-12-02T08:36:38.011Z"
+  },
+  {
+    "_id": "emotion_1764665072302_448",
+    "userId": "public_user",
+    "type": "text",
+    "content": "君不见黄河之水天上来，奔流到海不复回。",
+    "emotion": "anxious",
+    "score": 71.70441978332242,
+    "additionalEmotions": {
+      "happy": 0,
+      "sad": 0,
+      "angry": 0,
+      "anxious": 71.70441978332242,
+      "fearful": 0,
+      "surprised": 0,
+      "neutral": 0
+    },
+    "createdAt": "2025-12-02T08:44:32.302Z",
+    "updatedAt": "2025-12-02T08:44:32.302Z"
+  },
+  {
+    "_id": "emotion_1764665230440_922",
+    "userId": "public_user",
+    "type": "text",
+    "content": "你是不是父母死光了，跑到这里找存在感。",
+    "emotion": "angry",
+    "score": 80,
+    "additionalEmotions": {
+      "happy": 0,
+      "sad": 0,
+      "angry": 80,
+      "anxious": 0,
+      "fearful": 0,
+      "surprised": 0,
+      "neutral": 0
+    },
+    "createdAt": "2025-12-02T08:47:10.440Z",
+    "updatedAt": "2025-12-02T08:47:10.440Z"
+  },
+  {
+    "_id": "emotion_1764665565330_39",
+    "userId": "public_user",
+    "type": "text",
+    "content": "你是不是父母死光了，跑到这里找存在感。",
+    "emotion": "angry",
+    "score": 80,
+    "additionalEmotions": {
+      "happy": 0,
+      "sad": 0,
+      "angry": 80,
+      "anxious": 0,
+      "fearful": 0,
+      "surprised": 0,
+      "neutral": 0
+    },
+    "createdAt": "2025-12-02T08:52:45.330Z",
+    "updatedAt": "2025-12-02T08:52:45.330Z"
+  },
+  {
+    "_id": "emotion_1764668795382_271",
+    "userId": "public_user",
+    "type": "text",
+    "content": "你是不是父母死光了，跑到这里找存在感。",
+    "emotion": "angry",
+    "score": 80,
+    "additionalEmotions": {
+      "happy": 0,
+      "sad": 0,
+      "angry": 80,
+      "anxious": 0,
+      "fearful": 0,
+      "surprised": 0,
+      "neutral": 0
+    },
+    "createdAt": "2025-12-02T09:46:35.382Z",
+    "updatedAt": "2025-12-02T09:46:35.382Z"
+  },
+  {
+    "_id": "emotion_1764675719828_945",
+    "userId": "public_user",
+    "type": "text",
+    "content": "君不见，黄河之水，天上来!",
+    "emotion": "neutral",
+    "score": 77.77102988336823,
+    "additionalEmotions": {
+      "happy": 0,
+      "sad": 0,
+      "angry": 0,
+      "anxious": 0,
+      "fearful": 0,
+      "surprised": 0,
+      "neutral": 77.77102988336823
+    },
+    "createdAt": "2025-12-02T11:41:59.828Z",
+    "updatedAt": "2025-12-02T11:41:59.828Z"
+  },
+  {
+    "_id": "emotion_1764675725153_59",
+    "userId": "public_user",
+    "type": "text",
+    "content": "君不见，黄河之水天上来!",
+    "emotion": "neutral",
+    "score": 77.77102988336823,
+    "additionalEmotions": {
+      "happy": 0,
+      "sad": 0,
+      "angry": 0,
+      "anxious": 0,
+      "fearful": 0,
+      "surprised": 0,
+      "neutral": 77.77102988336823
+    },
+    "createdAt": "2025-12-02T11:42:05.153Z",
+    "updatedAt": "2025-12-02T11:42:05.153Z"
+  },
+  {
+    "_id": "emotion_1764675725401_978",
+    "userId": "public_user",
+    "type": "text",
+    "content": "君不见，黄河之水天上来!",
+    "emotion": "neutral",
+    "score": 77.77102988336823,
+    "additionalEmotions": {
+      "happy": 0,
+      "sad": 0,
+      "angry": 0,
+      "anxious": 0,
+      "fearful": 0,
+      "surprised": 0,
+      "neutral": 77.77102988336823
+    },
+    "createdAt": "2025-12-02T11:42:05.401Z",
+    "updatedAt": "2025-12-02T11:42:05.401Z"
+  },
+  {
+    "_id": "emotion_1764675725484_102",
+    "userId": "public_user",
+    "type": "text",
+    "content": "君不见，黄河之水天上来!",
+    "emotion": "neutral",
+    "score": 77.77102988336823,
+    "additionalEmotions": {
+      "happy": 0,
+      "sad": 0,
+      "angry": 0,
+      "anxious": 0,
+      "fearful": 0,
+      "surprised": 0,
+      "neutral": 77.77102988336823
+    },
+    "createdAt": "2025-12-02T11:42:05.484Z",
+    "updatedAt": "2025-12-02T11:42:05.484Z"
+  },
+  {
+    "_id": "emotion_1764675729389_289",
+    "userId": "public_user",
+    "type": "text",
+    "content": "君不见黄河之水天上来!",
+    "emotion": "neutral",
+    "score": 78.91635296321077,
+    "additionalEmotions": {
+      "happy": 0,
+      "sad": 0,
+      "angry": 0,
+      "anxious": 0,
+      "fearful": 0,
+      "surprised": 0,
+      "neutral": 78.91635296321077
+    },
+    "createdAt": "2025-12-02T11:42:09.389Z",
+    "updatedAt": "2025-12-02T11:42:09.389Z"
+  },
+  {
+    "_id": "emotion_1764677586555_627",
+    "userId": "public_user",
+    "type": "text",
+    "content": "君不见，黄河之水，天上来！",
+    "emotion": "neutral",
+    "score": 77.77102988336823,
+    "additionalEmotions": {
+      "happy": 0,
+      "sad": 0,
+      "angry": 0,
+      "anxious": 0,
+      "fearful": 0,
+      "surprised": 0,
+      "neutral": 77.77102988336823
+    },
+    "createdAt": "2025-12-02T12:13:06.555Z",
+    "updatedAt": "2025-12-02T12:13:06.555Z"
+  }
+]
