@@ -1,0 +1,39 @@
+[
+  {
+    "_id": "user_1",
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "$2a$10$eGmtCphQYfeI0nrxN1HF3.WeInRvB9Nwa4IqYVE8Hdsh.WUHFPA6e",
+    "role": "student",
+    "phone": "13800138000",
+    "gender": "male",
+    "age": 20,
+    "grade": "??",
+    "class": "???1?",
+    "department": "?????"
+  },
+  {
+    "_id": "user_2",
+    "name": "测试用户",
+    "email": "test@test.com",
+    "password": "$2a$10$bSXti1AEJajNKnv/86Kk/eWWUqkpOd8CSfUtkAlwWNKgetCXxcqWy",
+    "role": "student",
+    "teacherId": "987654321",
+    "phone": "12345678901",
+    "gender": "male",
+    "age": 22
+  },
+  {
+    "_id": "user_3",
+    "name": "?????",
+    "email": "newuser@example.com",
+    "password": "$2a$10$AqZRT73f1irkOBGB/TrFP.4klS4r8tyVeHb4aoMCMKUA5/s2KQwY6",
+    "role": "student",
+    "studentId": "20240002",
+    "phone": "13800138001",
+    "gender": "?",
+    "age": 21,
+    "grade": "??",
+    "class": "????2?"
+  }
+]

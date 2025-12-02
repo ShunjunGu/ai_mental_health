@@ -1,7 +1,9 @@
-import React, { useState, useContext } from 'react'
-import { Card, Typography, Form, Input, Button, Avatar, Space, Row, Col, Switch } from 'antd'
+import React, { useState, useContext, useEffect } from 'react'
+import { Card, Typography, Form, Input, Button, Avatar, Space, Row, Col, Switch, message } from 'antd'
 import { UserOutlined, EditOutlined, SaveOutlined, MailOutlined, PhoneOutlined, HomeOutlined } from '@ant-design/icons'
 import { EmotionContext, emotionToColors } from '../App'
+import { useAuth } from '../contexts/AuthContext'
+import { emotionService } from '../services/emotionService'
 
 const { Title, Paragraph } = Typography
 
@@ -9,19 +11,27 @@ const UserProfile: React.FC = () => {
   const [form] = Form.useForm()
   const [editing, setEditing] = useState(false)
   const { emotion } = useContext(EmotionContext)
+  const { user, updateUser } = useAuth()
+  
+  // 情绪统计数据
+  const [monthlyAnalysisCount, setMonthlyAnalysisCount] = useState(0)
+  const [emotionStabilityIndex, setEmotionStabilityIndex] = useState(0)
+  const [recentEmotionStatus, setRecentEmotionStatus] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
   
   // 获取当前情绪对应的颜色
   const getCurrentColors = () => {
     return emotionToColors[emotion.toLowerCase()] || emotionToColors.neutral
   }
 
-  const userInfo = {
-    name: '张三',
-    email: 'zhangsan@example.com',
-    phone: '13800138000',
-    school: '清华大学',
-    major: '计算机科学与技术',
-    grade: '大三'
+  // 使用真实用户信息或默认值
+  const userInfo = user || {
+    name: '用户',
+    email: '',
+    phone: '',
+    school: '',
+    major: '',
+    grade: ''
   }
 
   const handleEdit = () => {
@@ -29,16 +39,109 @@ const UserProfile: React.FC = () => {
     form.setFieldsValue(userInfo)
   }
 
-  const handleSave = () => {
-    form.validateFields().then(values => {
+  const handleSave = async () => {
+    try {
+      const values = await form.validateFields()
       console.log('保存用户信息:', values)
+      await updateUser(values)
+      message.success('用户信息更新成功')
       setEditing(false)
-    })
+    } catch (error) {
+      console.error('更新用户信息失败:', error)
+      message.error('更新用户信息失败，请稍后重试')
+    }
   }
 
   const handleCancel = () => {
     setEditing(false)
   }
+
+  // 获取用户情绪统计数据
+  const fetchEmotionStatistics = async () => {
+    setIsLoading(true)
+    
+    try {
+      // 获取本月分析次数（无论用户是否登录）
+      const count = await emotionService.getMonthlyAnalysisCount()
+      setMonthlyAnalysisCount(count)
+      console.log('本月分析次数:', count)
+    } catch (error) {
+      console.error('获取本月分析次数失败:', error)
+      setMonthlyAnalysisCount(0)
+    }
+    
+    try {
+      // 只有登录用户才获取情绪稳定指数和状态
+      if (user && localStorage.getItem('token')) {
+        // 获取情绪统计数据计算稳定指数
+        const statistics = await emotionService.getEmotionStatistics()
+        console.log('情绪统计数据:', statistics)
+        
+        if (statistics.length > 0) {
+          // 简单计算情绪稳定指数（基于平均分）
+          // 由于我们现在使用的是stats端点，averageScore可能为0，我们可以基于情绪分布来计算
+          const totalCount = statistics.reduce((sum, item) => sum + item.count, 1)
+          
+          // 简单的情绪评分算法：积极情绪（happy, calm等）得分高，消极情绪（angry, anxious等）得分低
+          let totalScore = 0
+          statistics.forEach(item => {
+            let baseScore = 50 // 基础分数
+            
+            // 根据情绪类型调整分数
+            switch (item.emotion.toLowerCase()) {
+              case 'happy':
+              case 'calm':
+              case 'grateful':
+                baseScore = 80
+                break
+              case 'neutral':
+              case 'surprised':
+                baseScore = 60
+                break
+              case 'sad':
+              case 'tired':
+                baseScore = 40
+                break
+              case 'angry':
+              case 'anxious':
+              case 'fearful':
+                baseScore = 20
+                break
+            }
+            
+            totalScore += baseScore * item.count
+          })
+          
+          const averageScore = totalScore / totalCount
+          const stabilityIndex = Math.round(averageScore)
+          setEmotionStabilityIndex(stabilityIndex)
+          
+          // 根据平均分确定状态
+          if (stabilityIndex >= 70) {
+            setRecentEmotionStatus('良好')
+          } else if (stabilityIndex >= 50) {
+            setRecentEmotionStatus('一般')
+          } else {
+            setRecentEmotionStatus('需要关注')
+          }
+        }
+      } else {
+        // 未登录用户显示默认状态
+        setRecentEmotionStatus('')
+        setEmotionStabilityIndex(0)
+      }
+    } catch (error) {
+      console.error('获取情绪稳定指数失败:', error)
+      // 即使获取稳定指数失败，也不影响组件的其他功能
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // 组件加载时获取数据
+  useEffect(() => {
+    fetchEmotionStatistics()
+  }, [user])
 
   return (
     <div>
@@ -98,7 +201,10 @@ const UserProfile: React.FC = () => {
                   opacity: 0.8 
                 }}
               >
-                {userInfo.school} · {userInfo.major} · {userInfo.grade}
+                {userInfo.school && userInfo.major && userInfo.grade ? 
+                  `${userInfo.school} · ${userInfo.major} · ${userInfo.grade}` : 
+                  '请完善个人信息'
+                }
               </Paragraph>
               <Button
                 type="primary"
@@ -155,15 +261,35 @@ const UserProfile: React.FC = () => {
             <Space direction="vertical" size="large" style={{ width: '100%', marginTop: 16 }}>
               <div>
                 <strong style={{ color: getCurrentColors().text }}>最近情绪状态：</strong>
-                <span style={{ marginLeft: 8, color: getCurrentColors().primary, fontWeight: '700' }}>良好</span>
+                <span style={{ 
+                  marginLeft: 8, 
+                  color: recentEmotionStatus === '良好' ? 
+                    getCurrentColors().primary : 
+                    recentEmotionStatus === '一般' ? 
+                    '#faad14' : '#f5222d', 
+                  fontWeight: '700' 
+                }}>
+                  {isLoading ? '加载中...' : recentEmotionStatus || '暂无数据'}
+                </span>
               </div>
               <div>
                 <strong style={{ color: getCurrentColors().text }}>本月分析次数：</strong>
-                <span style={{ marginLeft: 8, color: getCurrentColors().text, fontWeight: '700' }}>24次</span>
+                <span style={{ marginLeft: 8, color: getCurrentColors().text, fontWeight: '700' }}>
+                  {isLoading ? '加载中...' : `${monthlyAnalysisCount}次`}
+                </span>
               </div>
               <div>
                 <strong style={{ color: getCurrentColors().text }}>情绪稳定指数：</strong>
-                <span style={{ marginLeft: 8, color: getCurrentColors().text, fontWeight: '700' }}>85分</span>
+                <span style={{ 
+                  marginLeft: 8, 
+                  color: emotionStabilityIndex >= 80 ? 
+                    getCurrentColors().primary : 
+                    emotionStabilityIndex >= 60 ? 
+                    '#faad14' : '#f5222d', 
+                  fontWeight: '700' 
+                }}>
+                  {isLoading ? '加载中...' : (emotionStabilityIndex > 0 ? `${emotionStabilityIndex}分` : '暂无数据')}
+                </span>
               </div>
             </Space>
           </Card>
@@ -204,6 +330,7 @@ const UserProfile: React.FC = () => {
                     rules={[{ required: true, message: '请输入姓名' }]}
                   >
                     <Input 
+                      prefix={<UserOutlined style={{ color: getCurrentColors().primary }} />}
                       placeholder="请输入姓名" 
                       style={{
                         border: `2px solid ${getCurrentColors().secondary}`,
@@ -344,10 +471,7 @@ const UserProfile: React.FC = () => {
                   checkedChildren="开" 
                   unCheckedChildren="关"
                   style={{
-                    backgroundColor: getCurrentColors().secondary,
-                    '&:checked': {
-                      backgroundColor: getCurrentColors().primary
-                    }
+                    backgroundColor: getCurrentColors().secondary
                   }}
                 />
               </div>
@@ -358,10 +482,7 @@ const UserProfile: React.FC = () => {
                   checkedChildren="开" 
                   unCheckedChildren="关"
                   style={{
-                    backgroundColor: getCurrentColors().secondary,
-                    '&:checked': {
-                      backgroundColor: getCurrentColors().primary
-                    }
+                    backgroundColor: getCurrentColors().secondary
                   }}
                 />
               </div>
@@ -372,10 +493,7 @@ const UserProfile: React.FC = () => {
                   checkedChildren="开" 
                   unCheckedChildren="关"
                   style={{
-                    backgroundColor: getCurrentColors().secondary,
-                    '&:checked': {
-                      backgroundColor: getCurrentColors().primary
-                    }
+                    backgroundColor: getCurrentColors().secondary
                   }}
                 />
               </div>

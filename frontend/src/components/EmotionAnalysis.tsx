@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { Card, Typography, Row, Col, Statistic, Select } from 'antd'
+import { Card, Typography, Row, Col, Statistic, Select, message } from 'antd'
 import { SmileOutlined, FrownOutlined, MehOutlined, ThunderboltOutlined, FrownOutlined as FearOutlined, HeartOutlined } from '@ant-design/icons'
 import ReactECharts from 'echarts-for-react'
-import axios from 'axios'
 import { EmotionContext, emotionToColors } from '../App'
+import { emotionService } from '../services/emotionService'
 
 const { Title, Paragraph } = Typography
 const { Option } = Select
@@ -46,12 +46,12 @@ const EmotionAnalysis: React.FC = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await axios.get('http://localhost:49740/api/emotions/stats', {
-        params: { timeRange }
-      })
-      setStats(response.data)
-    } catch (err) {
-      console.error('Fetch stats error:', err)
+      const response = await emotionService.getEmotionStatistics(timeRange)
+      setStats(response)
+      console.log('情绪统计数据获取成功:', response)
+    } catch (err: any) {
+      console.error('获取情绪统计数据失败:', err)
+      message.error(err.response?.data?.message || '获取情绪统计数据失败，请稍后再试')
     }
   }
 
