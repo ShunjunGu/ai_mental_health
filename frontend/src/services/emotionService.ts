@@ -122,26 +122,34 @@ class EmotionService {
       // 检查是否有token
       const token = localStorage.getItem('token');
       
-      // 使用相对路径，确保与API服务的基础URL一致
-      let url = `/api/emotions/stats?timeRange=month`;
+      // 构建查询参数
+      const params = new URLSearchParams();
+      params.append('timeRange', 'month');
+      
+      // 先尝试获取当前用户的记录
+      let total = 0;
       
       if (token) {
-        // 有token时，使用带认证的api实例调用stats端点
-        const response = await api.get<any>(url);
-        return response.data.total || 0;
-      } else {
-        // 没有token时，使用公共用户ID调用stats端点
-        url += `&userId=public_user`;
-        // 使用api实例的baseURL，而不是直接使用fetch
-        const response = await fetch(`${api.defaults.baseURL}${url}`);
-        if (response.ok) {
-          const data = await response.json();
-          return data.total || 0;
-        } else {
-          console.error('获取公共用户分析次数失败:', response.statusText);
-          return 0;
+        // 有token时，先获取用户自己的记录
+        const userResponse = await api.get<any>(`/api/emotions/stats?${params.toString()}`);
+        total = userResponse.data.total || 0;
+        
+        // 如果用户自己没有记录，获取公共用户的记录
+        if (total === 0) {
+          const publicParams = new URLSearchParams();
+          publicParams.append('timeRange', 'month');
+          publicParams.append('userId', 'public_user');
+          const publicResponse = await api.get<any>(`/api/emotions/stats?${publicParams.toString()}`);
+          total = publicResponse.data.total || 0;
         }
+      } else {
+        // 没有token时，直接获取公共用户的记录
+        params.append('userId', 'public_user');
+        const publicResponse = await api.get<any>(`/api/emotions/stats?${params.toString()}`);
+        total = publicResponse.data.total || 0;
       }
+      
+      return total;
     } catch (error) {
       console.error('获取本月分析次数失败:', error);
       return 0;
