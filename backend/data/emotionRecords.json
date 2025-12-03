@@ -226,5 +226,62 @@
     },
     "createdAt": "2025-12-02T12:13:06.555Z",
     "updatedAt": "2025-12-02T12:13:06.555Z"
+  },
+  {
+    "_id": "emotion_1764679734053_139",
+    "userId": "public_user",
+    "type": "text",
+    "content": "Hello, World!",
+    "emotion": "neutral",
+    "score": 80,
+    "additionalEmotions": {
+      "happy": 0,
+      "sad": 0,
+      "angry": 0,
+      "anxious": 0,
+      "fearful": 0,
+      "surprised": 0,
+      "neutral": 80
+    },
+    "createdAt": "2025-12-02T12:48:54.053Z",
+    "updatedAt": "2025-12-02T12:48:54.053Z"
+  },
+  {
+    "_id": "emotion_1764682075063_235",
+    "userId": "public_user",
+    "type": "text",
+    "content": "君不见黄河之水天上来，奔流到海不复回。",
+    "emotion": "anxious",
+    "score": 71.70441978332242,
+    "additionalEmotions": {
+      "happy": 0,
+      "sad": 0,
+      "angry": 0,
+      "anxious": 71.70441978332242,
+      "fearful": 0,
+      "surprised": 0,
+      "neutral": 0
+    },
+    "createdAt": "2025-12-02T13:27:55.063Z",
+    "updatedAt": "2025-12-02T13:27:55.064Z"
+  },
+  {
+    "_id": "emotion_1764684872003_763",
+    "userId": "public_user",
+    "type": "text",
+    "content": "君不见黄河之水天上来，奔流到海不复回。",
+    "emotion": "anxious",
+    "score": 71.70441978332242,
+    "additionalEmotions": {
+      "happy": 0,
+      "sad": 0,
+      "angry": 0,
+      "anxious": 71.70441978332242,
+      "fearful": 0,
+      "surprised": 0,
+      "neutral": 0
+    },
+    "createdAt": "2025-12-02T14:14:32.003Z",
+    "updatedAt": "2025-12-02T14:14:32.003Z"
   }
 ]

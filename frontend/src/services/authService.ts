@@ -43,13 +43,14 @@ export interface RegisterRequest {
 
 // 定义认证响应类型
 export interface AuthResponse {
+  message: string;
   token: string;
   user: User;
 }
 
 // 创建axios实例
 export const api = axios.create({
-    baseURL: 'http://localhost:57214',
+    baseURL: 'http://localhost:57215',
     timeout: 10000,
     headers: {
       'Content-Type': 'application/json',
