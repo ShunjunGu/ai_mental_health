@@ -1,5 +1,8 @@
 const http = require('http');
 
+// 加载环境变量
+require('dotenv').config();
+
 // 测试登录API - 配置说明：
 // 1. 请确保在项目根目录创建.env文件并添加以下环境变量：
 //    TEST_EMAIL=your_test_email@example.com
