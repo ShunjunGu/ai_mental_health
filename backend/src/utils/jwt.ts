@@ -23,7 +23,7 @@ export const generateToken = (userId: string, role: string): string => {
 // 验证JWT令牌
 export const verifyToken = (token: string): { userId: string; role: string } | null => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { userId: string; role: string };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default-secret-key') as { userId: string; role: string };
     return decoded;
   } catch (error) {
     console.error('验证JWT令牌失败:', error);

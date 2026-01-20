@@ -3,7 +3,7 @@ import { ConfigProvider } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
 import { Layout, Menu, Typography, Button, Avatar, Dropdown, Space } from 'antd'
 import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from 'react-router-dom'
-import { UserOutlined, LogoutOutlined } from '@ant-design/icons'
+import { UserOutlined, LogoutOutlined, TeamOutlined } from '@ant-design/icons'
 import './index.css'
 
 // 导入组件
@@ -13,6 +13,7 @@ import EmotionAnalysis from './components/EmotionAnalysis'
 import UserProfile from './components/UserProfile'
 import Login from './components/Login'
 import Register from './components/Register'
+import AdminDashboard from './components/AdminDashboard'
 import PrivateRoute from './components/PrivateRoute'
 
 // 导入认证上下文
@@ -164,7 +165,8 @@ const AppNavigation = () => {
       recognition: '/',
       history: '/history',
       analysis: '/analysis',
-      profile: '/profile'
+      profile: '/profile',
+      admin: '/admin'
     }
     navigate(routeMap[e.key] || '/')
   }
@@ -232,6 +234,10 @@ const AppNavigation = () => {
               key: 'profile',
               label: <Link to="/profile" style={{ color: getCurrentColors().text, fontWeight: current === 'profile' ? '700' : '500' }}>个人中心</Link>,
             },
+            {
+              key: 'admin',
+              label: <Link to="/admin" style={{ color: getCurrentColors().text, fontWeight: current === 'admin' ? '700' : '500' }}><TeamOutlined /> 后台管理</Link>,
+            },
           ]}
         />
 
@@ -269,13 +275,14 @@ const AppNavigation = () => {
           {/* 公共路由 */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          
+          <Route path="/admin" element={<AdminDashboard />} />
+
           {/* 受保护的路由 */}
-          <Route element={<PrivateRoute />}>
-            <Route path="/" element={<EmotionRecognition />} />
-            <Route path="/history" element={<EmotionHistory />} />
-            <Route path="/analysis" element={<EmotionAnalysis />} />
-            <Route path="/profile" element={<UserProfile />} />
+          <Route path="/" element={<PrivateRoute />}>
+            <Route index element={<EmotionRecognition />} />
+            <Route path="history" element={<EmotionHistory />} />
+            <Route path="analysis" element={<EmotionAnalysis />} />
+            <Route path="profile" element={<UserProfile />} />
           </Route>
         </Routes>
       </Layout.Content>

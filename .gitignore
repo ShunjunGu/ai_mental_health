@@ -50,6 +50,9 @@ dist-ssr
 Thumbs.db
 .DS_Store
 
+# IDE files
+.trae
+
 # Package manager locks (optional, comment if you want to track them)
 # package-lock.json
 # yarn.lock

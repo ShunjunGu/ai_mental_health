@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Card, Typography, Form, Input, Button, message, Divider } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { EmotionContext, emotionToColors } from '../App';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -12,6 +12,7 @@ const Login: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { emotion } = useContext(EmotionContext);
   const { login } = useAuth();
 
@@ -26,7 +27,10 @@ const Login: React.FC = () => {
     try {
       await login(values);
       message.success('登录成功！');
-      navigate('/');
+
+      // 获取登录前想要访问的页面，如果没有则默认跳转到首页
+      const from = (location.state as any)?.from?.pathname || '/';
+      navigate(from, { replace: true });
     } catch (error: any) {
       message.error(error.response?.data?.message || '登录失败，请检查您的邮箱和密码');
     } finally {

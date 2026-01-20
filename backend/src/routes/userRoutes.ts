@@ -26,7 +26,7 @@ router.put('/me', authenticate, updateUser);
 // 更改密码（需要认证）
 router.put('/change-password', authenticate, changePassword);
 
-// 临时端点：获取所有用户（仅用于调试，不需要认证）
-router.get('/all', getAllUsers);
+// 获取所有用户（需要认证，仅用于后台管理）
+router.get('/all', authenticate, getAllUsers);
 
 export default router;

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Card, Typography, Form, Input, Button, message, Divider, Row, Col, Select } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined, TeamOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
@@ -15,6 +15,15 @@ const Register: React.FC = () => {
   const navigate = useNavigate();
   const { emotion } = useContext(EmotionContext);
   const { register } = useAuth();
+  
+  // 获取当前角色值（添加默认值保护）
+  const role = Form.useWatch(['role'], form) || 'student';
+  
+  // 设置表单初始值
+  useEffect(() => {
+    form.setFieldValue('role', 'student');
+  }, [form]);
+  
   // 监听表单值变化
   const handleValuesChange = (changedValues: any) => {
     // 当角色改变时，重置相关字段
@@ -263,12 +272,13 @@ const Register: React.FC = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name={form.getFieldValue('role') === 'student' ? 'studentId' : 'teacherId'}
-                label={<span style={{ color: getCurrentColors().text }}>{form.getFieldValue('role') === 'student' ? '学号' : '工号'}</span>}
-                rules={[{ required: true, message: `请输入您的${form.getFieldValue('role') === 'student' ? '学号' : '工号'}` }]}
+                name={role === 'student' ? 'studentId' : 'teacherId'}
+                label={<span style={{ color: getCurrentColors().text }}>{role === 'student' ? '学号' : '工号'}</span>}
+                dependencies={['role']}
+                rules={[{ required: true, message: `请输入您的${role === 'student' ? '学号' : '工号'}` }]}
               >
                 <Input
-                  placeholder={`请输入${form.getFieldValue('role') === 'student' ? '学号' : '工号'}`}
+                  placeholder={`请输入${role === 'student' ? '学号' : '工号'}`}
                   style={{
                     border: `2px solid ${getCurrentColors().secondary}`,
                     borderRadius: '8px',
@@ -282,7 +292,7 @@ const Register: React.FC = () => {
           </Row>
 
           {/* 学生特有字段 */}
-          {form.getFieldValue('role') === 'student' && (
+          {role === 'student' && (
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
@@ -324,7 +334,7 @@ const Register: React.FC = () => {
           )}
 
           {/* 教师和咨询师特有字段 */}
-          {(form.getFieldValue('role') === 'teacher' || form.getFieldValue('role') === 'counselor') && (
+          {(role === 'teacher' || role === 'counselor') && (
             <Row gutter={16}>
               <Col span={24}>
                 <Form.Item
