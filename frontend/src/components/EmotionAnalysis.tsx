@@ -2,34 +2,29 @@ import React, { useState, useEffect, useContext } from 'react'
 import { Card, Typography, Row, Col, Statistic, Select, message } from 'antd'
 import { SmileOutlined, FrownOutlined, MehOutlined, ThunderboltOutlined, FrownOutlined as FearOutlined, HeartOutlined } from '@ant-design/icons'
 import ReactECharts from 'echarts-for-react'
-import { EmotionContext, emotionToColors } from '../App'
+import { EmotionContext, emotionToColors, emotionToColorsDark } from '../App'
+import { useDarkMode } from '../contexts/DarkModeContext'
 import { emotionService } from '../services/emotionService'
 
 const { Title, Paragraph } = Typography
 const { Option } = Select
 
-interface EmotionStats {
-  total: number
-  distribution: Record<string, number>
-  trend: Array<{
-    date: string
-    count: number
-    emotions: Record<string, number>
-  }>
-}
-
 const EmotionAnalysis: React.FC = () => {
-  const [stats, setStats] = useState<EmotionStats>({
-    total: 0,
-    distribution: {},
-    trend: []
-  })
+  const [stats, setStats] = useState<any[]>([])
+  const [total, setTotal] = useState<number>(0)
   const [timeRange, setTimeRange] = useState('week')
   const { emotion } = useContext(EmotionContext)
-  
+  const { isDarkMode } = useDarkMode()
+
   // 获取当前情绪对应的颜色
   const getCurrentColors = () => {
-    return emotionToColors[emotion.toLowerCase()] || emotionToColors.neutral
+    const colorMap = isDarkMode ? emotionToColorsDark : emotionToColors
+    return colorMap[emotion.toLowerCase()] || (isDarkMode ? emotionToColorsDark.neutral : emotionToColors.neutral)
+  }
+
+  // 获取卡片背景色
+  const getCardBackground = () => {
+    return isDarkMode ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.85)'
   }
 
   const getEmotionIcon = (emotion: string) => {
@@ -46,8 +41,30 @@ const EmotionAnalysis: React.FC = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await emotionService.getEmotionStatistics(timeRange)
+      // 获取当前日期
+      const endDate = new Date().toISOString().split('T')[0]
+      let startDate = ''
+
+      // 根据时间范围计算开始日期
+      if (timeRange === 'week') {
+        const weekAgo = new Date()
+        weekAgo.setDate(weekAgo.getDate() - 7)
+        startDate = weekAgo.toISOString().split('T')[0]
+      } else if (timeRange === 'month') {
+        const monthAgo = new Date()
+        monthAgo.setMonth(monthAgo.getMonth() - 1)
+        startDate = monthAgo.toISOString().split('T')[0]
+      } else if (timeRange === 'quarter') {
+        const quarterAgo = new Date()
+        quarterAgo.setMonth(quarterAgo.getMonth() - 3)
+        startDate = quarterAgo.toISOString().split('T')[0]
+      }
+
+      const response = await emotionService.getEmotionStatistics(startDate, endDate)
       setStats(response)
+      // 计算总分析次数
+      const totalCount = response.reduce((sum, item) => sum + item.count, 0)
+      setTotal(totalCount)
       console.log('情绪统计数据获取成功:', response)
     } catch (err: any) {
       console.error('获取情绪统计数据失败:', err)
@@ -78,9 +95,9 @@ const EmotionAnalysis: React.FC = () => {
         name: '情绪类型',
         type: 'pie',
         radius: '50%',
-        data: Object.entries(stats.distribution).map(([emotion, count]) => ({
-          value: count,
-          name: emotion
+        data: stats.map(item => ({
+          value: item.count,
+          name: item.emotion
         })),
         emphasis: {
           itemStyle: {
@@ -93,17 +110,17 @@ const EmotionAnalysis: React.FC = () => {
     ]
   }
 
-  // 情绪趋势折线图配置
+  // 简化的情绪趋势图配置
   const lineOption = {
     title: {
-      text: '情绪变化趋势',
+      text: '情绪分布',
       left: 'center'
     },
     tooltip: {
       trigger: 'axis'
     },
     legend: {
-      data: ['喜悦', '愤怒', '悲伤', '恐惧', '惊讶', '中性'],
+      data: stats.map(item => item.emotion),
       bottom: 0
     },
     grid: {
@@ -114,48 +131,44 @@ const EmotionAnalysis: React.FC = () => {
     },
     xAxis: {
       type: 'category',
-      boundaryGap: false,
-      data: stats.trend.map(item => item.date)
+      data: ['情绪分布']
     },
     yAxis: {
       type: 'value'
     },
-    series: [
-      '喜悦', '愤怒', '悲伤', '恐惧', '惊讶', '中性'
-    ].map(emotion => ({
-      name: emotion,
-      type: 'line',
-      stack: 'Total',
-      data: stats.trend.map(item => item.emotions[emotion] || 0)
+    series: stats.map(item => ({
+      name: item.emotion,
+      type: 'bar',
+      data: [item.count]
     }))
   }
 
   return (
     <div>
-      <Title 
-        level={2} 
-        style={{ 
-          color: getCurrentColors().text, 
+      <Title
+        level={2}
+        style={{
+          color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
           fontWeight: '700',
           marginBottom: '16px'
         }}
       >
         情绪统计分析
       </Title>
-      <Paragraph 
-        style={{ 
-          color: getCurrentColors().text, 
+      <Paragraph
+        style={{
+          color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
           marginBottom: '32px'
         }}
       >
         查看您的情绪变化趋势和分布情况
       </Paragraph>
 
-      <Card 
-        className="card" 
+      <Card
+        className="card"
         style={{
           marginBottom: 24,
-          background: 'rgba(255, 255, 255, 0.85)',
+          background: getCardBackground(),
           backdropFilter: 'blur(10px)',
           border: `2px solid ${getCurrentColors().primary}`,
           borderRadius: '12px',
@@ -167,7 +180,7 @@ const EmotionAnalysis: React.FC = () => {
           <Select
             value={timeRange}
             onChange={setTimeRange}
-            style={{ 
+            style={{
               width: 120,
               border: `2px solid ${getCurrentColors().secondary}`,
               borderRadius: '8px',
@@ -183,38 +196,38 @@ const EmotionAnalysis: React.FC = () => {
 
         <Row gutter={[16, 16]}>
           <Col span={12} lg={8}>
-            <Card 
+            <Card
               className="card"
               style={{
-                background: 'rgba(255, 255, 255, 0.9)',
+                background: getCardBackground(),
                 border: `2px solid ${getCurrentColors().secondary}`,
                 borderRadius: '12px',
                 transition: 'all 0.3s ease'
               }}
             >
               <Statistic
-                title={<span style={{ color: getCurrentColors().text }}>总分析次数</span>}
-                value={stats.total}
+                title={<span style={{ color: isDarkMode ? '#b0b0b0' : getCurrentColors().text }}>总分析次数</span>}
+                value={total}
                 prefix={<SmileOutlined style={{ color: getCurrentColors().primary }} />}
                 valueStyle={{ color: getCurrentColors().primary, fontWeight: '700' }}
               />
             </Card>
           </Col>
-          {Object.entries(stats.distribution).map(([emotion, count]) => (
-            <Col key={emotion} span={12} lg={8}>
-              <Card 
-                className={`card ${emotion.toLowerCase()}`}
+          {stats.map((item) => (
+            <Col key={item.emotion} span={12} lg={8}>
+              <Card
+                className={`card ${item.emotion.toLowerCase()}`}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.9)',
+                  background: getCardBackground(),
                   border: `2px solid ${getCurrentColors().secondary}`,
                   borderRadius: '12px',
                   transition: 'all 0.3s ease'
                 }}
               >
                 <Statistic
-                  title={<span style={{ color: getCurrentColors().text }}>{emotion}</span>}
-                  value={count}
-                  prefix={getEmotionIcon(emotion)}
+                  title={<span style={{ color: isDarkMode ? '#b0b0b0' : getCurrentColors().text }}>{item.emotion}</span>}
+                  value={item.count}
+                  prefix={getEmotionIcon(item.emotion)}
                   valueStyle={{ color: getCurrentColors().primary, fontWeight: '700' }}
                 />
               </Card>
@@ -225,10 +238,10 @@ const EmotionAnalysis: React.FC = () => {
 
       <Row gutter={[16, 16]}>
         <Col span={24} lg={12}>
-          <Card 
+          <Card
             className="card"
             style={{
-              background: 'rgba(255, 255, 255, 0.85)',
+              background: getCardBackground(),
               backdropFilter: 'blur(10px)',
               border: `2px solid ${getCurrentColors().primary}`,
               borderRadius: '12px',
@@ -236,10 +249,10 @@ const EmotionAnalysis: React.FC = () => {
               transition: 'all 0.3s ease'
             }}
           >
-            <Title 
-              level={4} 
-              style={{ 
-                color: getCurrentColors().text, 
+            <Title
+              level={4}
+              style={{
+                color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
                 fontWeight: '700',
                 marginBottom: '16px'
               }}
@@ -247,38 +260,38 @@ const EmotionAnalysis: React.FC = () => {
               情绪分布
             </Title>
             <div className="chart-container">
-              <ReactECharts 
+              <ReactECharts
                 option={{
                   ...pieOption,
                   title: {
                     ...pieOption.title,
                     textStyle: {
-                      color: getCurrentColors().text,
+                      color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
                       fontWeight: '700'
                     }
                   },
                   tooltip: {
                     ...pieOption.tooltip,
                     textStyle: {
-                      color: getCurrentColors().text
+                      color: isDarkMode ? '#e0e0e0' : getCurrentColors().text
                     }
                   },
                   legend: {
                     ...pieOption.legend,
                     textStyle: {
-                      color: getCurrentColors().text
+                      color: isDarkMode ? '#e0e0e0' : getCurrentColors().text
                     }
                   }
-                }} 
+                }}
               />
             </div>
           </Card>
         </Col>
         <Col span={24} lg={12}>
-          <Card 
+          <Card
             className="card"
             style={{
-              background: 'rgba(255, 255, 255, 0.85)',
+              background: getCardBackground(),
               backdropFilter: 'blur(10px)',
               border: `2px solid ${getCurrentColors().primary}`,
               borderRadius: '12px',
@@ -286,10 +299,10 @@ const EmotionAnalysis: React.FC = () => {
               transition: 'all 0.3s ease'
             }}
           >
-            <Title 
-              level={4} 
-              style={{ 
-                color: getCurrentColors().text, 
+            <Title
+              level={4}
+              style={{
+                color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
                 fontWeight: '700',
                 marginBottom: '16px'
               }}
@@ -297,32 +310,32 @@ const EmotionAnalysis: React.FC = () => {
               情绪变化趋势
             </Title>
             <div className="chart-container">
-              <ReactECharts 
+              <ReactECharts
                 option={{
                   ...lineOption,
                   title: {
                     ...lineOption.title,
                     textStyle: {
-                      color: getCurrentColors().text,
+                      color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
                       fontWeight: '700'
                     }
                   },
                   tooltip: {
                     ...lineOption.tooltip,
                     textStyle: {
-                      color: getCurrentColors().text
+                      color: isDarkMode ? '#e0e0e0' : getCurrentColors().text
                     }
                   },
                   legend: {
                     ...lineOption.legend,
                     textStyle: {
-                      color: getCurrentColors().text
+                      color: isDarkMode ? '#e0e0e0' : getCurrentColors().text
                     }
                   },
                   xAxis: {
                     ...lineOption.xAxis,
                     axisLabel: {
-                      color: getCurrentColors().text
+                      color: isDarkMode ? '#e0e0e0' : getCurrentColors().text
                     },
                     axisLine: {
                       lineStyle: {
@@ -333,7 +346,7 @@ const EmotionAnalysis: React.FC = () => {
                   yAxis: {
                     ...lineOption.yAxis,
                     axisLabel: {
-                      color: getCurrentColors().text
+                      color: isDarkMode ? '#e0e0e0' : getCurrentColors().text
                     },
                     axisLine: {
                       lineStyle: {
@@ -346,7 +359,7 @@ const EmotionAnalysis: React.FC = () => {
                       }
                     }
                   }
-                }} 
+                }}
               />
             </div>
           </Card>

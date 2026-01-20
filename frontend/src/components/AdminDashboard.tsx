@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Card, Table, Typography, Input, Select, Space, Tag, message, Row, Col, Statistic, Button, Spin } from 'antd';
-import { SearchOutlined, UserOutlined, TeamOutlined, EyeOutlined, LoginOutlined } from '@ant-design/icons';
+import { Card, Table, Typography, Input, Select, Tag, message, Row, Col, Statistic, Button, Spin, Space } from 'antd';
+import { SearchOutlined, UserOutlined, TeamOutlined, LoginOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import { EmotionContext, emotionToColors } from '../App';
+import { EmotionContext, emotionToColors, emotionToColorsDark } from '../App';
+import { useDarkMode } from '../contexts/DarkModeContext';
 import { api } from '../services/authService';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const { Title, Paragraph } = Typography;
-const { Search } = Input;
 const { Option } = Select;
 
 // 用户接口定义
@@ -33,7 +33,6 @@ interface User {
 const roleMap: Record<string, string> = {
   student: '学生',
   teacher: '教师',
-  counselor: '心理咨询师',
   admin: '管理员'
 };
 
@@ -52,13 +51,28 @@ const AdminDashboard: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState<string | undefined>();
   const { emotion } = useContext(EmotionContext);
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isDarkMode } = useDarkMode();
   const navigate = useNavigate();
-  
+
   // 获取当前情绪对应的颜色
   const getCurrentColors = () => {
-    return emotionToColors[emotion.toLowerCase()] || emotionToColors.neutral;
+    const colorMap = isDarkMode ? emotionToColorsDark : emotionToColors;
+    return colorMap[emotion.toLowerCase()] || (isDarkMode ? emotionToColorsDark.neutral : emotionToColors.neutral);
   };
-  
+
+  // 获取卡片背景色
+  const getCardBackground = () => {
+    return isDarkMode ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)';
+  };
+
+  // 获取统计卡片背景色
+  const getStatisticBackground = (color: string) => {
+    if (isDarkMode) {
+      return 'rgba(255, 255, 255, 0.05)';
+    }
+    return color;
+  };
+
   // 检查访问权限
   useEffect(() => {
     if (!authLoading) {
@@ -69,33 +83,33 @@ const AdminDashboard: React.FC = () => {
       }
     }
   }, [authLoading, isAuthenticated, user, navigate]);
-  
+
   // 如果正在加载认证状态，显示加载中
   if (authLoading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '70vh' 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '70vh'
       }}>
         <Spin size="large" />
       </div>
     );
   }
-  
+
   // 如果未登录，显示登录提示
   if (!isAuthenticated) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '70vh' 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '70vh'
       }}>
         <Card
           style={{
-            background: 'rgba(255, 255, 255, 0.95)',
+            background: getCardBackground(),
             backdropFilter: 'blur(10px)',
             border: `2px solid ${getCurrentColors().primary}`,
             borderRadius: '16px',
@@ -107,7 +121,7 @@ const AdminDashboard: React.FC = () => {
           <Title level={2} style={{ color: getCurrentColors().primary, marginBottom: '24px' }}>
             请先登录
           </Title>
-          <Paragraph style={{ color: getCurrentColors().text, marginBottom: '32px' }}>
+          <Paragraph style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text, marginBottom: '32px' }}>
             访问管理后台需要先登录账号
           </Paragraph>
           <Button
@@ -127,19 +141,19 @@ const AdminDashboard: React.FC = () => {
       </div>
     );
   }
-  
+
   // 如果不是管理员，显示权限不足提示
   if (user?.role !== 'admin') {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '70vh' 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '70vh'
       }}>
         <Card
           style={{
-            background: 'rgba(255, 255, 255, 0.95)',
+            background: getCardBackground(),
             backdropFilter: 'blur(10px)',
             border: `2px solid ${getCurrentColors().primary}`,
             borderRadius: '16px',
@@ -151,7 +165,7 @@ const AdminDashboard: React.FC = () => {
           <Title level={2} style={{ color: getCurrentColors().primary, marginBottom: '24px' }}>
             权限不足
           </Title>
-          <Paragraph style={{ color: getCurrentColors().text, marginBottom: '32px' }}>
+          <Paragraph style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text, marginBottom: '32px' }}>
             只有管理员才能访问管理后台
           </Paragraph>
           <Button
@@ -223,14 +237,14 @@ const AdminDashboard: React.FC = () => {
       dataIndex: '_id',
       key: '_id',
       width: 80,
-      render: (text: string) => <span style={{ fontSize: '12px', color: '#999' }}>{text.split('_')[1]}</span>,
+      render: (text: string) => <span style={{ fontSize: '12px', color: isDarkMode ? '#808080' : '#999' }}>{text.split('_')[1]}</span>,
     },
     {
       title: '姓名',
       dataIndex: 'name',
       key: 'name',
       width: 120,
-      render: (text: string) => <strong>{text}</strong>,
+      render: (text: string) => <strong style={{ color: isDarkMode ? '#e0e0e0' : 'inherit' }}>{text}</strong>,
     },
     {
       title: '邮箱',
@@ -238,6 +252,7 @@ const AdminDashboard: React.FC = () => {
       key: 'email',
       width: 200,
       ellipsis: true,
+      render: (text: string) => <span style={{ color: isDarkMode ? '#b0b0b0' : 'inherit' }}>{text}</span>,
     },
     {
       title: '角色',
@@ -248,7 +263,6 @@ const AdminDashboard: React.FC = () => {
         const colors: Record<string, string> = {
           student: 'blue',
           teacher: 'green',
-          counselor: 'purple',
           admin: 'red',
         };
         return <Tag color={colors[role]}>{roleMap[role] || role}</Tag>;
@@ -301,14 +315,13 @@ const AdminDashboard: React.FC = () => {
     total: users.length,
     students: users.filter(u => u.role === 'student').length,
     teachers: users.filter(u => u.role === 'teacher').length,
-    counselors: users.filter(u => u.role === 'counselor').length,
   };
 
   return (
     <div style={{ padding: '24px' }}>
       <Card
         style={{
-          background: 'rgba(255, 255, 255, 0.95)',
+          background: getCardBackground(),
           backdropFilter: 'blur(10px)',
           border: `2px solid ${getCurrentColors().primary}`,
           borderRadius: '16px',
@@ -328,7 +341,7 @@ const AdminDashboard: React.FC = () => {
             <TeamOutlined style={{ marginRight: '12px' }} />
             用户管理后台
           </Title>
-          <Paragraph style={{ color: getCurrentColors().text, marginBottom: '0' }}>
+          <Paragraph style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text, marginBottom: '0' }}>
             查看和管理所有注册用户信息
           </Paragraph>
         </div>
@@ -337,12 +350,12 @@ const AdminDashboard: React.FC = () => {
         <Row gutter={16} style={{ marginBottom: '24px' }}>
           <Col span={6}>
             <Statistic
-              title="总用户数"
+              title={<span style={{ color: isDarkMode ? '#b0b0b0' : 'inherit' }}>总用户数</span>}
               value={statistics.total}
               prefix={<UserOutlined />}
               valueStyle={{ color: '#1890ff' }}
               style={{
-                background: 'rgba(24, 144, 255, 0.1)',
+                background: getStatisticBackground('rgba(24, 144, 255, 0.1)'),
                 padding: '16px',
                 borderRadius: '8px',
               }}
@@ -350,11 +363,11 @@ const AdminDashboard: React.FC = () => {
           </Col>
           <Col span={6}>
             <Statistic
-              title="学生"
+              title={<span style={{ color: isDarkMode ? '#b0b0b0' : 'inherit' }}>学生</span>}
               value={statistics.students}
               valueStyle={{ color: '#52c41a' }}
               style={{
-                background: 'rgba(82, 196, 26, 0.1)',
+                background: getStatisticBackground('rgba(82, 196, 26, 0.1)'),
                 padding: '16px',
                 borderRadius: '8px',
               }}
@@ -362,23 +375,11 @@ const AdminDashboard: React.FC = () => {
           </Col>
           <Col span={6}>
             <Statistic
-              title="教师"
+              title={<span style={{ color: isDarkMode ? '#b0b0b0' : 'inherit' }}>教师</span>}
               value={statistics.teachers}
               valueStyle={{ color: '#faad14' }}
               style={{
-                background: 'rgba(250, 173, 20, 0.1)',
-                padding: '16px',
-                borderRadius: '8px',
-              }}
-            />
-          </Col>
-          <Col span={6}>
-            <Statistic
-              title="心理咨询师"
-              value={statistics.counselors}
-              valueStyle={{ color: '#722ed1' }}
-              style={{
-                background: 'rgba(114, 46, 209, 0.1)',
+                background: getStatisticBackground('rgba(250, 173, 20, 0.1)'),
                 padding: '16px',
                 borderRadius: '8px',
               }}
@@ -387,25 +388,21 @@ const AdminDashboard: React.FC = () => {
         </Row>
 
         {/* 搜索和筛选 */}
-        <Space style={{ marginBottom: '16px', width: '100%', justifyContent: 'space-between' }}>
-          <Space>
-            <Space.Compact block>
-              <Input
-                placeholder="搜索姓名、邮箱、学号/工号、电话"
-                allowClear
-                size="large"
-                style={{ width: 350 }}
-                onChange={(e) => setSearchText(e.target.value)}
-              />
-              <Button
-                type="primary"
-                size="large"
-                icon={<SearchOutlined />}
-                onClick={() => setSearchText(searchText)}
-              >
-                搜索
-              </Button>
-            </Space.Compact>
+        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <Input.Search
+              placeholder="搜索姓名、邮箱、学号/工号、电话"
+              allowClear
+              size="large"
+              style={{ width: 450 }}
+              onSearch={() => setSearchText(searchText)}
+              onChange={(e) => setSearchText(e.target.value)}
+              enterButton={
+                <Button type="primary" size="large" icon={<SearchOutlined />}>
+                  搜索
+                </Button>
+              }
+            />
             <Select
               placeholder="筛选角色"
               allowClear
@@ -415,16 +412,13 @@ const AdminDashboard: React.FC = () => {
             >
               <Option value="student">学生</Option>
               <Option value="teacher">教师</Option>
-              <Option value="counselor">心理咨询师</Option>
               <Option value="admin">管理员</Option>
             </Select>
-          </Space>
-          <Space>
-            <span style={{ color: getCurrentColors().text }}>
-              显示 {filteredUsers.length} / 共 {users.length} 位用户
-            </span>
-          </Space>
-        </Space>
+          </div>
+          <span style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>
+            显示 {filteredUsers.length} / 共 {users.length} 位用户
+          </span>
+        </div>
 
         {/* 用户表格 */}
         <Table
@@ -441,7 +435,7 @@ const AdminDashboard: React.FC = () => {
           scroll={{ x: 1200 }}
           rowHoverable
           style={{
-            background: 'rgba(255, 255, 255, 0.9)',
+            background: isDarkMode ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.9)',
             borderRadius: '8px',
           }}
         />

@@ -1,8 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { Card, Typography, Form, Input, Button, Avatar, Space, Row, Col, Switch, message } from 'antd'
 import { UserOutlined, EditOutlined, SaveOutlined, MailOutlined, PhoneOutlined, HomeOutlined } from '@ant-design/icons'
-import { EmotionContext, emotionToColors } from '../App'
+import { EmotionContext, emotionToColors, emotionToColorsDark } from '../App'
 import { useAuth } from '../contexts/AuthContext'
+import { useDarkMode } from '../contexts/DarkModeContext'
 import { emotionService } from '../services/emotionService'
 
 const { Title, Paragraph } = Typography
@@ -12,16 +13,28 @@ const UserProfile: React.FC = () => {
   const [editing, setEditing] = useState(false)
   const { emotion } = useContext(EmotionContext)
   const { user, updateUser } = useAuth()
-  
+  const { isDarkMode } = useDarkMode()
+
   // 情绪统计数据
   const [monthlyAnalysisCount, setMonthlyAnalysisCount] = useState(0)
   const [emotionStabilityIndex, setEmotionStabilityIndex] = useState(0)
   const [recentEmotionStatus, setRecentEmotionStatus] = useState('')
   const [isLoading, setIsLoading] = useState(true)
-  
+
   // 获取当前情绪对应的颜色
   const getCurrentColors = () => {
-    return emotionToColors[emotion.toLowerCase()] || emotionToColors.neutral
+    const colorMap = isDarkMode ? emotionToColorsDark : emotionToColors
+    return colorMap[emotion.toLowerCase()] || (isDarkMode ? emotionToColorsDark.neutral : emotionToColors.neutral)
+  }
+
+  // 获取卡片背景色
+  const getCardBackground = () => {
+    return isDarkMode ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.85)'
+  }
+
+  // 获取输入框背景色
+  const getInputBackground = () => {
+    return isDarkMode ? 'rgba(42, 42, 42, 0.95)' : 'rgba(255, 255, 255, 0.9)'
   }
 
   // 使用真实用户信息或默认值
@@ -166,10 +179,10 @@ const UserProfile: React.FC = () => {
 
       <Row gutter={[24, 24]}>
         <Col span={24} lg={8}>
-          <Card 
+          <Card
             className="card"
             style={{
-              background: 'rgba(255, 255, 255, 0.85)',
+              background: getCardBackground(),
               backdropFilter: 'blur(10px)',
               border: `2px solid ${getCurrentColors().primary}`,
               borderRadius: '12px',
@@ -178,31 +191,31 @@ const UserProfile: React.FC = () => {
             }}
           >
             <div style={{ textAlign: 'center' }}>
-              <Avatar 
-                size={128} 
-                icon={<UserOutlined style={{ color: getCurrentColors().primary }} />} 
-                style={{ 
-                  marginBottom: 16, 
-                  background: `linear-gradient(135deg, ${getCurrentColors().primary}, ${getCurrentColors().secondary})` 
-                }} 
+              <Avatar
+                size={128}
+                icon={<UserOutlined style={{ color: getCurrentColors().primary }} />}
+                style={{
+                  marginBottom: 16,
+                  background: `linear-gradient(135deg, ${getCurrentColors().primary}, ${getCurrentColors().secondary})`
+                }}
               />
-              <Title 
-                level={3} 
-                style={{ 
-                  color: getCurrentColors().text, 
-                  fontWeight: '700' 
+              <Title
+                level={3}
+                style={{
+                  color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
+                  fontWeight: '700'
                 }}
               >
                 {userInfo.name}
               </Title>
-              <Paragraph 
-                style={{ 
-                  color: getCurrentColors().text, 
-                  opacity: 0.8 
+              <Paragraph
+                style={{
+                  color: isDarkMode ? '#b0b0b0' : getCurrentColors().text,
+                  opacity: 0.8
                 }}
               >
-                {userInfo.school && userInfo.major && userInfo.grade ? 
-                  `${userInfo.school} · ${userInfo.major} · ${userInfo.grade}` : 
+                {userInfo.school && userInfo.major && userInfo.grade ?
+                  `${userInfo.school} · ${userInfo.major} · ${userInfo.grade}` :
                   '请完善个人信息'
                 }
               </Paragraph>
@@ -223,11 +236,11 @@ const UserProfile: React.FC = () => {
                 {editing ? '保存' : '编辑资料'}
               </Button>
               {editing && (
-                <Button 
+                <Button
                   onClick={handleCancel}
                   style={{
                     border: `2px solid ${getCurrentColors().secondary}`,
-                    color: getCurrentColors().text,
+                    color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
                     borderRadius: '8px',
                     transition: 'all 0.3s ease'
                   }}
@@ -238,10 +251,10 @@ const UserProfile: React.FC = () => {
             </div>
           </Card>
 
-          <Card 
+          <Card
             className="card"
             style={{
-              background: 'rgba(255, 255, 255, 0.85)',
+              background: getCardBackground(),
               backdropFilter: 'blur(10px)',
               border: `2px solid ${getCurrentColors().primary}`,
               borderRadius: '12px',
@@ -249,44 +262,44 @@ const UserProfile: React.FC = () => {
               transition: 'all 0.3s ease'
             }}
           >
-            <Title 
-              level={4} 
-              style={{ 
-                color: getCurrentColors().text, 
-                fontWeight: '700' 
+            <Title
+              level={4}
+              style={{
+                color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
+                fontWeight: '700'
               }}
             >
               心理健康状态
             </Title>
             <Space direction="vertical" size="large" style={{ width: '100%', marginTop: 16 }}>
               <div>
-                <strong style={{ color: getCurrentColors().text }}>最近情绪状态：</strong>
-                <span style={{ 
-                  marginLeft: 8, 
-                  color: recentEmotionStatus === '良好' ? 
-                    getCurrentColors().primary : 
-                    recentEmotionStatus === '一般' ? 
-                    '#faad14' : '#f5222d', 
-                  fontWeight: '700' 
+                <strong style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>最近情绪状态：</strong>
+                <span style={{
+                  marginLeft: 8,
+                  color: recentEmotionStatus === '良好' ?
+                    getCurrentColors().primary :
+                    recentEmotionStatus === '一般' ?
+                    '#faad14' : '#f5222d',
+                  fontWeight: '700'
                 }}>
                   {isLoading ? '加载中...' : recentEmotionStatus || '暂无数据'}
                 </span>
               </div>
               <div>
-                <strong style={{ color: getCurrentColors().text }}>本月分析次数：</strong>
-                <span style={{ marginLeft: 8, color: getCurrentColors().text, fontWeight: '700' }}>
+                <strong style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>本月分析次数：</strong>
+                <span style={{ marginLeft: 8, color: getCurrentColors().primary, fontWeight: '700' }}>
                   {isLoading ? '加载中...' : `${monthlyAnalysisCount}次`}
                 </span>
               </div>
               <div>
-                <strong style={{ color: getCurrentColors().text }}>情绪稳定指数：</strong>
-                <span style={{ 
-                  marginLeft: 8, 
-                  color: emotionStabilityIndex >= 80 ? 
-                    getCurrentColors().primary : 
-                    emotionStabilityIndex >= 60 ? 
-                    '#faad14' : '#f5222d', 
-                  fontWeight: '700' 
+                <strong style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>情绪稳定指数：</strong>
+                <span style={{
+                  marginLeft: 8,
+                  color: emotionStabilityIndex >= 80 ?
+                    getCurrentColors().primary :
+                    emotionStabilityIndex >= 60 ?
+                    '#faad14' : '#f5222d',
+                  fontWeight: '700'
                 }}>
                   {isLoading ? '加载中...' : (emotionStabilityIndex > 0 ? `${emotionStabilityIndex}分` : '暂无数据')}
                 </span>
@@ -296,10 +309,10 @@ const UserProfile: React.FC = () => {
         </Col>
 
         <Col span={24} lg={16}>
-          <Card 
+          <Card
             className="card"
             style={{
-              background: 'rgba(255, 255, 255, 0.85)',
+              background: getCardBackground(),
               backdropFilter: 'blur(10px)',
               border: `2px solid ${getCurrentColors().primary}`,
               borderRadius: '12px',
@@ -307,11 +320,11 @@ const UserProfile: React.FC = () => {
               transition: 'all 0.3s ease'
             }}
           >
-            <Title 
-              level={4} 
-              style={{ 
-                color: getCurrentColors().text, 
-                fontWeight: '700' 
+            <Title
+              level={4}
+              style={{
+                color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
+                fontWeight: '700'
               }}
             >
               个人信息
@@ -326,17 +339,17 @@ const UserProfile: React.FC = () => {
                 <Col span={24} lg={12}>
                   <Form.Item
                     name="name"
-                    label={<span style={{ color: getCurrentColors().text }}>姓名</span>}
+                    label={<span style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>姓名</span>}
                     rules={[{ required: true, message: '请输入姓名' }]}
                   >
-                    <Input 
+                    <Input
                       prefix={<UserOutlined style={{ color: getCurrentColors().primary }} />}
-                      placeholder="请输入姓名" 
+                      placeholder="请输入姓名"
                       style={{
                         border: `2px solid ${getCurrentColors().secondary}`,
                         borderRadius: '8px',
-                        color: getCurrentColors().text,
-                        background: 'rgba(255, 255, 255, 0.9)',
+                        color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
+                        background: getInputBackground(),
                         transition: 'border-color 0.3s ease'
                       }}
                     />
@@ -345,17 +358,17 @@ const UserProfile: React.FC = () => {
                 <Col span={24} lg={12}>
                   <Form.Item
                     name="email"
-                    label={<span style={{ color: getCurrentColors().text }}>邮箱</span>}
+                    label={<span style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>邮箱</span>}
                     rules={[{ required: true, message: '请输入邮箱' }, { type: 'email', message: '请输入正确的邮箱格式' }]}
                   >
-                    <Input 
-                      placeholder="请输入邮箱" 
-                      prefix={<MailOutlined style={{ color: getCurrentColors().primary }} />} 
+                    <Input
+                      placeholder="请输入邮箱"
+                      prefix={<MailOutlined style={{ color: getCurrentColors().primary }} />}
                       style={{
                         border: `2px solid ${getCurrentColors().secondary}`,
                         borderRadius: '8px',
-                        color: getCurrentColors().text,
-                        background: 'rgba(255, 255, 255, 0.9)',
+                        color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
+                        background: getInputBackground(),
                         transition: 'border-color 0.3s ease'
                       }}
                     />
@@ -366,17 +379,17 @@ const UserProfile: React.FC = () => {
                 <Col span={24} lg={12}>
                   <Form.Item
                     name="phone"
-                    label={<span style={{ color: getCurrentColors().text }}>电话</span>}
+                    label={<span style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>电话</span>}
                     rules={[{ required: true, message: '请输入电话' }]}
                   >
-                    <Input 
-                      placeholder="请输入电话" 
-                      prefix={<PhoneOutlined style={{ color: getCurrentColors().primary }} />} 
+                    <Input
+                      placeholder="请输入电话"
+                      prefix={<PhoneOutlined style={{ color: getCurrentColors().primary }} />}
                       style={{
                         border: `2px solid ${getCurrentColors().secondary}`,
                         borderRadius: '8px',
-                        color: getCurrentColors().text,
-                        background: 'rgba(255, 255, 255, 0.9)',
+                        color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
+                        background: getInputBackground(),
                         transition: 'border-color 0.3s ease'
                       }}
                     />
@@ -385,17 +398,17 @@ const UserProfile: React.FC = () => {
                 <Col span={24} lg={12}>
                   <Form.Item
                     name="school"
-                    label={<span style={{ color: getCurrentColors().text }}>学校</span>}
+                    label={<span style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>学校</span>}
                     rules={[{ required: true, message: '请输入学校' }]}
                   >
-                    <Input 
-                      placeholder="请输入学校" 
-                      prefix={<HomeOutlined style={{ color: getCurrentColors().primary }} />} 
+                    <Input
+                      placeholder="请输入学校"
+                      prefix={<HomeOutlined style={{ color: getCurrentColors().primary }} />}
                       style={{
                         border: `2px solid ${getCurrentColors().secondary}`,
                         borderRadius: '8px',
-                        color: getCurrentColors().text,
-                        background: 'rgba(255, 255, 255, 0.9)',
+                        color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
+                        background: getInputBackground(),
                         transition: 'border-color 0.3s ease'
                       }}
                     />
@@ -406,16 +419,16 @@ const UserProfile: React.FC = () => {
                 <Col span={24} lg={12}>
                   <Form.Item
                     name="major"
-                    label={<span style={{ color: getCurrentColors().text }}>专业</span>}
+                    label={<span style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>专业</span>}
                     rules={[{ required: true, message: '请输入专业' }]}
                   >
-                    <Input 
-                      placeholder="请输入专业" 
+                    <Input
+                      placeholder="请输入专业"
                       style={{
                         border: `2px solid ${getCurrentColors().secondary}`,
                         borderRadius: '8px',
-                        color: getCurrentColors().text,
-                        background: 'rgba(255, 255, 255, 0.9)',
+                        color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
+                        background: getInputBackground(),
                         transition: 'border-color 0.3s ease'
                       }}
                     />
@@ -424,16 +437,16 @@ const UserProfile: React.FC = () => {
                 <Col span={24} lg={12}>
                   <Form.Item
                     name="grade"
-                    label={<span style={{ color: getCurrentColors().text }}>年级</span>}
+                    label={<span style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>年级</span>}
                     rules={[{ required: true, message: '请输入年级' }]}
                   >
-                    <Input 
-                      placeholder="请输入年级" 
+                    <Input
+                      placeholder="请输入年级"
                       style={{
                         border: `2px solid ${getCurrentColors().secondary}`,
                         borderRadius: '8px',
-                        color: getCurrentColors().text,
-                        background: 'rgba(255, 255, 255, 0.9)',
+                        color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
+                        background: getInputBackground(),
                         transition: 'border-color 0.3s ease'
                       }}
                     />
@@ -443,10 +456,10 @@ const UserProfile: React.FC = () => {
             </Form>
           </Card>
 
-          <Card 
+          <Card
             className="card"
             style={{
-              background: 'rgba(255, 255, 255, 0.85)',
+              background: getCardBackground(),
               backdropFilter: 'blur(10px)',
               border: `2px solid ${getCurrentColors().primary}`,
               borderRadius: '12px',
@@ -454,47 +467,38 @@ const UserProfile: React.FC = () => {
               transition: 'all 0.3s ease'
             }}
           >
-            <Title 
-              level={4} 
-              style={{ 
-                color: getCurrentColors().text, 
-                fontWeight: '700' 
+            <Title
+              level={4}
+              style={{
+                color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
+                fontWeight: '700'
               }}
             >
               账户设置
             </Title>
             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: getCurrentColors().text }}>通知设置</span>
-                <Switch 
-                  defaultChecked 
-                  checkedChildren="开" 
+                <span style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>通知设置</span>
+                <Switch
+                  defaultChecked
+                  checkedChildren="开"
                   unCheckedChildren="关"
-                  style={{
-                    backgroundColor: getCurrentColors().secondary
-                  }}
                 />
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: getCurrentColors().text }}>情绪报告推送</span>
-                <Switch 
-                  defaultChecked 
-                  checkedChildren="开" 
+                <span style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>情绪报告推送</span>
+                <Switch
+                  defaultChecked
+                  checkedChildren="开"
                   unCheckedChildren="关"
-                  style={{
-                    backgroundColor: getCurrentColors().secondary
-                  }}
                 />
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: getCurrentColors().text }}>隐私保护</span>
-                <Switch 
-                  defaultChecked 
-                  checkedChildren="开" 
+                <span style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>隐私保护</span>
+                <Switch
+                  defaultChecked
+                  checkedChildren="开"
                   unCheckedChildren="关"
-                  style={{
-                    backgroundColor: getCurrentColors().secondary
-                  }}
                 />
               </div>
             </Space>

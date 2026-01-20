@@ -53,6 +53,5 @@ export const isAdmin = authorize(UserRole.ADMIN);
 
 // 教师或管理员角色中间件
 export const isTeacherOrAdmin = authorize(UserRole.TEACHER, UserRole.ADMIN);
-
 // 咨询师或管理员角色中间件
 export const isCounselorOrAdmin = authorize(UserRole.COUNSELOR, UserRole.ADMIN);

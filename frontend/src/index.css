@@ -576,51 +576,497 @@ body {
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
 }
 
+/* ========== 夜间模式样式 ========== */
+body.dark-mode {
+  --bg-primary: #1e1e1e;
+  --bg-secondary: #121212;
+  --bg-tertiary: #2a2a2a;
+  --text-primary: #e0e0e0;
+  --text-secondary: #b0b0b0;
+  --text-light: #808080;
+  --text-inverse: #1a1a1a;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.8);
+  --shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.9);
+}
+
+body.dark-mode {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* 夜间模式 Layout */
+body.dark-mode .layout {
+  background: transparent;
+}
+
+/* 夜间模式 Header */
+body.dark-mode .ant-layout-header {
+  background: rgba(30, 30, 30, 0.95) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* 夜间模式 Logo */
+body.dark-mode .logo {
+  color: var(--text-primary) !important;
+}
+
+/* 夜间模式菜单 */
+body.dark-mode .ant-menu {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+body.dark-mode .ant-menu-item {
+  color: var(--text-secondary);
+}
+
+body.dark-mode .ant-menu-item:hover {
+  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .ant-menu-item-selected {
+  color: var(--text-inverse) !important;
+  background: linear-gradient(135deg, #177ddc, #0958d9) !important;
+}
+
+/* 夜间模式内容区域 */
+body.dark-mode .ant-layout-content {
+  background: transparent;
+}
+
+body.dark-mode .site-layout-content {
+  background: rgba(30, 30, 30, 0.95);
+  backdrop-filter: blur(10px);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .site-layout-content:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* 夜间模式标题 */
+body.dark-mode .ant-typography h2,
+body.dark-mode .ant-typography h3,
+body.dark-mode .ant-typography h4 {
+  color: var(--text-primary) !important;
+}
+
+body.dark-mode .ant-typography p {
+  color: var(--text-secondary);
+}
+
+/* 夜间模式卡片 */
+body.dark-mode .card,
+body.dark-mode .ant-card {
+  background: var(--bg-primary);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+body.dark-mode .card:hover,
+body.dark-mode .ant-card:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* 夜间模式输入框 */
+body.dark-mode .ant-input,
+body.dark-mode .ant-input-textarea {
+  background: var(--bg-secondary);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-primary);
+}
+
+body.dark-mode .ant-input::placeholder,
+body.dark-mode .ant-input-textarea::placeholder {
+  color: var(--text-light);
+}
+
+body.dark-mode .ant-input:focus,
+body.dark-mode .ant-input-textarea:focus {
+  background: var(--bg-primary);
+  border-color: #177ddc;
+  box-shadow: 0 0 0 2px rgba(23, 125, 220, 0.2);
+}
+
+/* 夜间模式按钮 */
+body.dark-mode .ant-btn {
+  background: var(--bg-primary);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-primary);
+}
+
+body.dark-mode .ant-btn:hover {
+  background: var(--bg-tertiary);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--text-primary);
+}
+
+body.dark-mode .ant-btn-primary {
+  background: linear-gradient(135deg, #177ddc, #0958d9);
+  border-color: transparent;
+  color: white;
+}
+
+body.dark-mode .ant-btn-primary:hover {
+  background: linear-gradient(135deg, #0958d9, #0050b3);
+  color: white;
+}
+
+/* 夜间模式标签 */
+body.dark-mode .ant-tag {
+  background: var(--bg-tertiary);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+/* 夜间模式列表 */
+body.dark-mode .ant-list {
+  background: var(--bg-primary);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .ant-list-item {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+body.dark-mode .ant-list-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* 夜间模式统计卡片 */
+body.dark-mode .ant-statistic {
+  background: var(--bg-primary);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .ant-statistic-title {
+  color: var(--text-secondary) !important;
+}
+
+body.dark-mode .ant-statistic-content {
+  color: var(--text-primary) !important;
+}
+
+/* 夜间模式图表容器 */
+body.dark-mode .chart-container {
+  background: var(--bg-primary);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 夜间模式 Footer */
+body.dark-mode .ant-layout-footer {
+  background: rgba(30, 30, 30, 0.95) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-light);
+}
+
+/* 夜间模式 Modal */
+body.dark-mode .ant-modal-content,
+body.dark-mode .ant-modal-header {
+  background: var(--bg-primary);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .ant-modal-title {
+  color: var(--text-primary);
+}
+
+body.dark-mode .ant-modal-body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+body.dark-mode .ant-modal-close-x {
+  color: var(--text-secondary);
+}
+
+body.dark-mode .ant-modal-close-x:hover {
+  color: var(--text-primary);
+}
+
+/* 夜间模式 Dropdown */
+body.dark-mode .ant-dropdown {
+  background: var(--bg-primary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .ant-dropdown-menu {
+  background: var(--bg-primary);
+}
+
+body.dark-mode .ant-dropdown-menu-item {
+  color: var(--text-primary);
+}
+
+body.dark-mode .ant-dropdown-menu-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .ant-dropdown-menu-item-selected {
+  background: rgba(23, 125, 220, 0.2);
+}
+
+/* 夜间模式 Form */
+body.dark-mode .ant-form-item-label > label {
+  color: var(--text-primary);
+}
+
+body.dark-mode .ant-form-item-explain-error {
+  color: #ff4d4f;
+}
+
+/* 夜间模式 Table */
+body.dark-mode .ant-table {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+body.dark-mode .ant-table-thead > tr > th {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .ant-table-tbody > tr > td {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .ant-table-tbody > tr:hover > td {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* 夜间模式 Divider */
+body.dark-mode .ant-divider {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 夜间模式 Progress */
+body.dark-mode .ant-progress-text {
+  color: var(--text-primary);
+}
+
+/* 夜间模式 Tabs */
+body.dark-mode .ant-tabs-tab {
+  color: var(--text-secondary);
+}
+
+body.dark-mode .ant-tabs-tab:hover {
+  color: var(--text-primary);
+}
+
+body.dark-mode .ant-tabs-tab-active {
+  color: #177ddc;
+}
+
+body.dark-mode .ant-tabs-ink-bar {
+  background: #177ddc;
+}
+
+/* 夜间模式 Select */
+body.dark-mode .ant-select-selector {
+  background: var(--bg-secondary) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: var(--text-primary) !important;
+}
+
+body.dark-mode .ant-select-selection-placeholder {
+  color: var(--text-light) !important;
+}
+
+body.dark-mode .ant-select-dropdown {
+  background: var(--bg-primary) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .ant-select-item {
+  color: var(--text-primary);
+}
+
+body.dark-mode .ant-select-item-option-selected {
+  background: rgba(23, 125, 220, 0.2) !important;
+}
+
+body.dark-mode .ant-select-item-option-active {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* 夜间模式 Alert */
+body.dark-mode .ant-alert {
+  background: var(--bg-primary);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .ant-alert-message {
+  color: var(--text-primary);
+}
+
+body.dark-mode .ant-alert-description {
+  color: var(--text-secondary);
+}
+
+/* 夜间模式 Tooltip */
+body.dark-mode .ant-tooltip-inner {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+body.dark-mode .ant-tooltip-arrow-content {
+  background: var(--bg-tertiary);
+}
+
+/* 夜间模式 Pagination */
+body.dark-mode .ant-pagination-item {
+  background: var(--bg-primary);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .ant-pagination-item a {
+  color: var(--text-primary);
+}
+
+body.dark-mode .ant-pagination-item:hover {
+  border-color: #177ddc;
+}
+
+body.dark-mode .ant-pagination-item:hover a {
+  color: #177ddc;
+}
+
+body.dark-mode .ant-pagination-item-active {
+  background: #177ddc;
+  border-color: #177ddc;
+}
+
+body.dark-mode .ant-pagination-item-active a {
+  color: white;
+}
+
+/* ========== 情绪结果卡片夜间模式优化 ========== */
+body.dark-mode .emotion-result {
+  background: rgba(30, 30, 30, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-mode .emotion-result h4,
+body.dark-mode .emotion-result strong,
+body.dark-mode .emotion-result p,
+body.dark-mode .emotion-result span {
+  color: #e0e0e0 !important;
+}
+
+/* 情绪标签夜间模式优化 */
+body.dark-mode .emotion-result .ant-tag {
+  color: white !important;
+}
+
+/* 统计卡片夜间模式优化 */
+body.dark-mode .ant-statistic {
+  background: rgba(30, 30, 30, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-mode .ant-statistic .ant-statistic-title {
+  color: #b0b0b0 !important;
+}
+
+body.dark-mode .ant-statistic .ant-statistic-content {
+  color: #e0e0e0 !important;
+}
+
+/* 图表容器夜间模式优化 */
+body.dark-mode .chart-container {
+  background: rgba(30, 30, 30, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Empty 状态夜间模式优化 */
+body.dark-mode .ant-empty-description {
+  color: #b0b0b0 !important;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .ant-layout-content {
     padding: var(--spacing-md);
   }
-  
+
   .site-layout-content {
     padding: var(--spacing-md);
   }
-  
+
   .ant-layout-header {
     padding: 0 var(--spacing-md);
+    height: auto !important;
+    min-height: 64px;
+    flex-wrap: wrap;
+    padding: 12px var(--spacing-md) !important;
   }
-  
+
   .logo {
     font-size: 20px;
   }
-  
+
   .ant-typography h2 {
     font-size: 28px;
   }
-  
+
   .ant-typography h3 {
     font-size: 24px;
   }
-  
+
   .ant-typography h4 {
     font-size: 18px;
   }
-  
+
   .ant-btn {
     padding: var(--spacing-xs) var(--spacing-lg);
     font-size: 14px;
   }
-  
+
   .emotion-result {
     padding: var(--spacing-md);
   }
-  
+
   .chart-container {
     height: 300px;
     padding: var(--spacing-md);
   }
-  
+
   .ant-statistic-content {
     font-size: 32px !important;
+  }
+
+  /* 移动端导航优化 */
+  .gooey-nav-container nav ul {
+    gap: 1em;
+  }
+
+  .gooey-nav-container nav ul li a {
+    padding: 0.4em 0.6em;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  /* 小屏幕下隐藏标题,只显示导航 */
+  .ant-layout-header {
+    justify-content: center !important;
+  }
+
+  .gooey-nav-container nav ul {
+    gap: 0.8em;
+  }
+
+  .gooey-nav-container nav ul li a {
+    padding: 0.3em 0.5em;
+    font-size: 12px;
   }
 }

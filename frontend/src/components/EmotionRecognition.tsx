@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react'
 import { Card, Input, Button, Typography, Result, Tag, Space } from 'antd'
 import { SendOutlined, LoadingOutlined } from '@ant-design/icons'
-import { EmotionContext, emotionToColors } from '../App'
+import { EmotionContext, emotionToColors, emotionToColorsDark } from '../App'
+import { useDarkMode } from '../contexts/DarkModeContext'
 import { emotionService } from '../services/emotionService'
 
 const { TextArea } = Input
@@ -20,10 +21,17 @@ const EmotionRecognition: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const { emotion, setEmotion } = useContext(EmotionContext)
-  
+  const { isDarkMode } = useDarkMode()
+
   // 获取当前情绪对应的颜色
   const getCurrentColors = () => {
-    return emotionToColors[emotion.toLowerCase()] || emotionToColors.neutral
+    const colorMap = isDarkMode ? emotionToColorsDark : emotionToColors
+    return colorMap[emotion.toLowerCase()] || (isDarkMode ? emotionToColorsDark.neutral : emotionToColors.neutral)
+  }
+
+  // 获取卡片背景色
+  const getCardBackground = () => {
+    return isDarkMode ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.85)'
   }
 
   const analyzeEmotion = async () => {
@@ -73,10 +81,10 @@ const EmotionRecognition: React.FC = () => {
         请输入您的心情文字，我们将为您分析情绪状态
       </Paragraph>
 
-      <Card 
+      <Card
         className="card"
         style={{
-          background: 'rgba(255, 255, 255, 0.85)',
+          background: getCardBackground(),
           backdropFilter: 'blur(10px)',
           border: `2px solid ${getCurrentColors().primary}`,
           borderRadius: '12px',
@@ -96,8 +104,8 @@ const EmotionRecognition: React.FC = () => {
               borderRadius: '8px',
               fontSize: '16px',
               padding: '12px',
-              color: getCurrentColors().text,
-              background: 'rgba(255, 255, 255, 0.9)',
+              color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
+              background: isDarkMode ? 'rgba(42, 42, 42, 0.95)' : 'rgba(255, 255, 255, 0.9)',
               transition: 'border-color 0.3s ease'
             }}
 
@@ -111,14 +119,14 @@ const EmotionRecognition: React.FC = () => {
           block
           size="large"
           style={{
-            background: `linear-gradient(135deg, ${emotionToColors[(result ? result.emotion.toLowerCase() : emotion)].primary}, ${emotionToColors[(result ? result.emotion.toLowerCase() : emotion)].secondary})`,
+            background: `linear-gradient(135deg, ${getCurrentColors().primary}, ${getCurrentColors().secondary})`,
             border: 'none',
             color: '#FFFFFF',
             fontWeight: '700',
             fontSize: '16px',
             padding: '12px 32px',
             borderRadius: '50px',
-            boxShadow: `0 4px 16px rgba(${emotionToColors[(result ? result.emotion.toLowerCase() : emotion)].primary.replace('#', '')}, 0.15)`,
+            boxShadow: `0 4px 16px rgba(${getCurrentColors().primary.replace('#', '')}, 0.15)`,
             transition: 'all 0.3s ease'
           }}
         >
@@ -133,28 +141,29 @@ const EmotionRecognition: React.FC = () => {
           subTitle={error}
           style={{
             marginTop: '24px',
-            background: 'rgba(255, 255, 255, 0.85)',
+            background: getCardBackground(),
             backdropFilter: 'blur(10px)',
             border: `2px solid ${getCurrentColors().primary}`,
             borderRadius: '12px',
-            color: getCurrentColors().text
+            color: isDarkMode ? '#e0e0e0' : getCurrentColors().text
           }}
         />
       )}
 
       {result && (
-        <Card 
+        <Card
           className={`card emotion-result ${result.emotion.toLowerCase()}`}
           style={{
-            borderLeft: `4px solid ${emotionToColors[result.emotion.toLowerCase()].primary}`,
-            boxShadow: `0 4px 16px rgba(${emotionToColors[result.emotion.toLowerCase()].primary.replace('#', '')}, 0.1)`,
+            background: getCardBackground(),
+            borderLeft: `4px solid ${getCurrentColors().primary}`,
+            boxShadow: `0 4px 16px rgba(${getCurrentColors().primary.replace('#', '')}, 0.1)`,
             transition: 'all 0.3s ease'
           }}
         >
-          <Title 
-            level={4} 
+          <Title
+            level={4}
             style={{
-              color: emotionToColors[result.emotion.toLowerCase()].text,
+              color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
               fontWeight: '700'
             }}
           >
@@ -162,13 +171,13 @@ const EmotionRecognition: React.FC = () => {
           </Title>
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             <div>
-              <strong style={{ color: emotionToColors[result.emotion.toLowerCase()].text }}>识别情绪：</strong>
-              <Tag 
-                className={result.emotion.toLowerCase()} 
-                style={{ 
-                  marginLeft: 8, 
+              <strong style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>识别情绪：</strong>
+              <Tag
+                className={result.emotion.toLowerCase()}
+                style={{
+                  marginLeft: 8,
                   fontSize: 16,
-                  background: `linear-gradient(135deg, ${emotionToColors[result.emotion.toLowerCase()].primary}, ${emotionToColors[result.emotion.toLowerCase()].secondary})`,
+                  background: `linear-gradient(135deg, ${getCurrentColors().primary}, ${getCurrentColors().secondary})`,
                   color: '#FFFFFF',
                   border: 'none',
                   fontWeight: '700'
@@ -178,18 +187,18 @@ const EmotionRecognition: React.FC = () => {
               </Tag>
             </div>
             <div>
-              <strong style={{ color: emotionToColors[result.emotion.toLowerCase()].text }}>置信度：</strong>
-              <span style={{ color: emotionToColors[result.emotion.toLowerCase()].primary, fontWeight: '700' }}>
+              <strong style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>置信度：</strong>
+              <span style={{ color: getCurrentColors().primary, fontWeight: '700' }}>
                 {(result.confidence * 100).toFixed(2)}%
               </span>
             </div>
             <div>
-              <strong style={{ color: emotionToColors[result.emotion.toLowerCase()].text }}>建议：</strong>
-              <p style={{ color: emotionToColors[result.emotion.toLowerCase()].text }}>{result.suggestion}</p>
+              <strong style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>建议：</strong>
+              <p style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>{result.suggestion}</p>
             </div>
             <div>
-              <strong style={{ color: emotionToColors[result.emotion.toLowerCase()].text }}>分析时间：</strong>
-              <span style={{ color: emotionToColors[result.emotion.toLowerCase()].text }}>
+              <strong style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>分析时间：</strong>
+              <span style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>
                 {new Date(result.timestamp).toLocaleString()}
               </span>
             </div>

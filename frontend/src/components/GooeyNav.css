@@ -1,0 +1,333 @@
+:root {
+  --linear-ease: linear(
+    0,
+    0.068,
+    0.19 2.7%,
+    0.804 8.1%,
+    1.037,
+    1.199 13.2%,
+    1.245,
+    1.27 15.8%,
+    1.274,
+    1.272 17.4%,
+    1.249 19.1%,
+    0.996 28%,
+    0.949,
+    0.928 33.3%,
+    0.926,
+    0.933 36.8%,
+    1.001 45.6%,
+    1.013,
+    1.019 50.8%,
+    1.018 54.4%,
+    1 63.1%,
+    0.995 68%,
+    1.001 85%,
+    1
+  );
+
+  /* 粒子颜色 - 默认值，会被动态颜色覆盖 */
+  --color-1: #FFD700;
+  --color-2: #FF6B6B;
+  --color-3: #4ECDC4;
+  --color-4: #FF9FF3;
+  --primary-color: #1890ff;
+  --secondary-color: #40a9ff;
+}
+
+.gooey-nav-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gooey-nav-container nav {
+  display: flex;
+  position: relative;
+  transform: translate3d(0, 0, 0.01px);
+  width: 100%;
+}
+
+.gooey-nav-container nav ul {
+  display: flex;
+  gap: 1.5em;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  z-index: 3;
+  color: white;
+  text-shadow: 0 1px 1px hsl(205deg 30% 10% / 0.2);
+  align-items: center;
+  justify-content: center;
+}
+
+.gooey-nav-container nav ul li {
+  border-radius: 100vw;
+  position: relative;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.3s ease;
+  box-shadow: 0 0 0.5px 1.5px transparent;
+  color: #333;
+  font-weight: 500;
+  padding: 0.6em 1.2em;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gooey-nav-container nav ul li .nav-text {
+  position: relative;
+  z-index: 100;
+  pointer-events: none;
+  display: inline-block;
+}
+
+.gooey-nav-container nav ul li:hover {
+  color: #fff;
+}
+
+.gooey-nav-container nav ul li:hover .nav-text {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.gooey-nav-container nav ul li a {
+  display: inline-block;
+  padding: 0;
+  color: inherit;
+  text-decoration: none;
+  position: relative;
+  z-index: 10;
+}
+
+.gooey-nav-container nav ul li:focus-within:has(:focus-visible) {
+  box-shadow: 0 0 0.5px 1.5px white;
+}
+
+.gooey-nav-container nav ul li::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  border-radius: inherit;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.gooey-nav-container nav ul li::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary-color, #1890ff), var(--secondary-color, #40a9ff));
+  opacity: 0;
+  transform: scale(0.95);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+  filter: blur(0px);
+  pointer-events: none;
+}
+
+.gooey-nav-container nav ul li:hover::after {
+  opacity: 0.4;
+  transform: scale(0.98);
+  filter: blur(2px);
+}
+
+.gooey-nav-container nav ul li.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.gooey-nav-container nav ul li.active .nav-text {
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+.gooey-nav-container nav ul li.active::after {
+  opacity: 1;
+  transform: scale(1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: blur(0px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.gooey-nav-container .effect {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  z-index: 1;
+}
+
+.gooey-nav-container .effect.active {
+  opacity: 1;
+}
+
+.gooey-nav-container .effect.text {
+  color: white;
+  transition: color 0.3s ease;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.gooey-nav-container .effect.text.active {
+  color: white;
+}
+
+.gooey-nav-container .effect.filter {
+  filter: blur(4px) contrast(50);
+  mix-blend-mode: overlay;
+}
+
+.gooey-nav-container .effect.filter::before {
+  content: '';
+  position: absolute;
+  inset: -75px;
+  z-index: -2;
+  background: transparent;
+}
+
+.gooey-nav-container .effect.filter::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, var(--primary-color, #1890ff), var(--secondary-color, #40a9ff));
+  transform: scale(0);
+  opacity: 0;
+  z-index: -1;
+  border-radius: 100%;
+  animation: pill 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.gooey-nav-container .effect.active.filter::after {
+  transform: scale(1);
+  opacity: 0.8;
+}
+
+@keyframes pill {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.particle,
+.point {
+  display: block;
+  opacity: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  transform-origin: center;
+}
+
+.particle {
+  --time: 5s;
+  position: absolute;
+  top: calc(50% - 8px);
+  left: calc(50% - 8px);
+  animation: particle calc(var(--time)) ease forwards;
+}
+
+.point {
+  background: var(--color);
+  opacity: 1;
+  animation: point calc(var(--time)) ease forwards;
+}
+
+@keyframes particle {
+  0% {
+    transform: rotate(0deg) translate(calc(var(--start-x)), calc(var(--start-y)));
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+  }
+
+  50% {
+    transform: rotate(calc(var(--rotate) * 0.5)) translate(calc(var(--end-x) * 1.1), calc(var(--end-y) * 1.1));
+    opacity: 1;
+    animation-timing-function: ease;
+  }
+
+  80% {
+    transform: rotate(calc(var(--rotate) * 0.8)) translate(calc(var(--end-x)), calc(var(--end-y)));
+    opacity: 1;
+  }
+
+  100% {
+    transform: rotate(calc(var(--rotate) * 1.2)) translate(calc(var(--end-x) * 0.8), calc(var(--end-y) * 0.8));
+    opacity: 0.8;
+  }
+}
+
+@keyframes point {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+  }
+
+  20% {
+    transform: scale(calc(var(--scale) * 0.5));
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: scale(var(--scale));
+    opacity: 1;
+    animation-timing-function: ease;
+  }
+
+  80% {
+    transform: scale(var(--scale));
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+/* ========== GooeyNav 夜间模式样式 ========== */
+.gooey-nav-container.dark-mode nav ul li {
+  color: #e0e0e0;
+}
+
+.gooey-nav-container.dark-mode nav ul li:hover {
+  color: white;
+}
+
+.gooey-nav-container.dark-mode nav ul li.active {
+  color: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.gooey-nav-container.dark-mode .effect.text {
+  color: #e0e0e0;
+}
+
+.gooey-nav-container.dark-mode .effect.text.active {
+  color: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* 粒子夜间模式优化 - 增强发光效果 */
+body.dark-mode .point {
+  filter: brightness(1.3);
+}
+
+body.dark-mode .particle {
+  filter: brightness(1.2);
+}

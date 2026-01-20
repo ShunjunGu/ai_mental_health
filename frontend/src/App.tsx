@@ -1,9 +1,10 @@
 import React, { useState, createContext, useContext } from 'react'
-import { ConfigProvider } from 'antd'
+import { ConfigProvider, theme } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
-import { Layout, Menu, Typography, Button, Avatar, Dropdown, Space } from 'antd'
+import { Layout, Typography, Button, Avatar, Dropdown, Space } from 'antd'
 import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from 'react-router-dom'
-import { UserOutlined, LogoutOutlined, TeamOutlined } from '@ant-design/icons'
+import { UserOutlined, LogoutOutlined, TeamOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons'
+import GooeyNav from './components/GooeyNav'
 import './index.css'
 
 // 导入组件
@@ -18,6 +19,7 @@ import PrivateRoute from './components/PrivateRoute'
 
 // 导入认证上下文
 import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { DarkModeProvider, useDarkMode } from './contexts/DarkModeContext'
 
 
 
@@ -33,7 +35,7 @@ export const EmotionContext = createContext<EmotionContextType>({
   setEmotion: () => {}
 })
 
-// 情绪到颜色的映射
+// 情绪到颜色的映射 - 日间模式
 export const emotionToColors: Record<string, {
   background: string
   primary: string
@@ -96,6 +98,69 @@ export const emotionToColors: Record<string, {
   }
 }
 
+// 情绪到颜色的映射 - 夜间模式（增强对比度）
+export const emotionToColorsDark: Record<string, {
+  background: string
+  primary: string
+  secondary: string
+  text: string
+}> = {
+  happy: {
+    background: 'linear-gradient(135deg, #1a1a00 0%, #2d2000 100%)',
+    primary: '#FFB74D',
+    secondary: '#FFA726',
+    text: '#FFF3E0'
+  },
+  sad: {
+    background: 'linear-gradient(135deg, #0a1628 0%, #0d2137 100%)',
+    primary: '#64B5F6',
+    secondary: '#42A5F5',
+    text: '#E3F2FD'
+  },
+  angry: {
+    background: 'linear-gradient(135deg, #280000 0%, #370b0b 100%)',
+    primary: '#EF5350',
+    secondary: '#E53935',
+    text: '#FFEBEE'
+  },
+  anxious: {
+    background: 'linear-gradient(135deg, #1a1a00 0%, #2d2000 100%)',
+    primary: '#FFB74D',
+    secondary: '#FFA726',
+    text: '#FFF3E0'
+  },
+  fearful: {
+    background: 'linear-gradient(135deg, #1a0b28 0%, #250d37 100%)',
+    primary: '#BA68C8',
+    secondary: '#AB47BC',
+    text: '#F3E5F5'
+  },
+  fear: {
+    background: 'linear-gradient(135deg, #1a0b28 0%, #250d37 100%)',
+    primary: '#BA68C8',
+    secondary: '#AB47BC',
+    text: '#F3E5F5'
+  },
+  surprised: {
+    background: 'linear-gradient(135deg, #1a1a00 0%, #2d2000 100%)',
+    primary: '#FFD54F',
+    secondary: '#FFCA28',
+    text: '#FFF8E1'
+  },
+  surprise: {
+    background: 'linear-gradient(135deg, #1a1a00 0%, #2d2000 100%)',
+    primary: '#FFD54F',
+    secondary: '#FFCA28',
+    text: '#FFF8E1'
+  },
+  neutral: {
+    background: 'linear-gradient(135deg, #0b1a0f 0%, #0d2817 100%)',
+    primary: '#81C784',
+    secondary: '#66BB6A',
+    text: '#E8F5E9'
+  }
+}
+
 // 用户菜单组件
 const UserMenu = () => {
   const navigate = useNavigate()
@@ -140,7 +205,7 @@ const UserMenu = () => {
       <Space style={{ cursor: 'pointer' }}>
         <Avatar
           icon={<UserOutlined />}
-          style={{ 
+          style={{
             backgroundColor: '#1890ff',
             marginRight: '8px'
           }}
@@ -157,9 +222,19 @@ const AppNavigation = () => {
   const [current, setCurrent] = useState('recognition')
   const { isAuthenticated } = useAuth()
   const { emotion } = useContext(EmotionContext)
+  const { isDarkMode, toggleDarkMode } = useDarkMode()
 
-  const handleClick = (e: any) => {
-    setCurrent(e.key)
+  const navItems = [
+    { label: '情绪识别', href: '#', key: 'recognition' },
+    { label: '历史记录', href: '#', key: 'history' },
+    { label: '情绪分析', href: '#', key: 'analysis' },
+    { label: '个人中心', href: '#', key: 'profile' },
+    { label: '后台管理', href: '#', key: 'admin' }
+  ];
+
+  const handleNavItemClick = (index: number) => {
+    const key = navItems[index].key;
+    setCurrent(key);
     // 映射key到正确的路由路径
     const routeMap: Record<string, string> = {
       recognition: '/',
@@ -168,85 +243,118 @@ const AppNavigation = () => {
       profile: '/profile',
       admin: '/admin'
     }
-    navigate(routeMap[e.key] || '/')
-  }
+    navigate(routeMap[key] || '/')
+  };
+
+  const getActiveIndex = () => {
+    return navItems.findIndex(item => item.key === current);
+  };
 
   const getCurrentColors = () => {
     const lowerEmotion = emotion.toLowerCase();
-    const colors = emotionToColors[lowerEmotion];
+    const colorMap = isDarkMode ? emotionToColorsDark : emotionToColors;
+    const colors = colorMap[lowerEmotion];
     console.log('Current emotion:', emotion);
-    console.log('Lowercase emotion:', lowerEmotion);
+    console.log('Dark mode:', isDarkMode);
     console.log('Colors found:', colors);
-    return colors || emotionToColors.neutral;
+    return colors || (isDarkMode ? emotionToColorsDark.neutral : emotionToColors.neutral);
   }
 
   return (
-    <Layout style={{ 
+    <Layout style={{
         minHeight: '100vh',
         background: getCurrentColors().background,
         transition: 'all 0.5s ease'
       }}>
-      <Layout.Header 
+      <Layout.Header
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          background: 'rgba(255, 255, 255, 0.85)',
+          height: '80px',
+          lineHeight: '80px',
+          padding: '0 32px',
+          background: isDarkMode ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.85)',
           backdropFilter: 'blur(10px)',
-          borderBottom: `2px solid ${getCurrentColors().primary}`
+          borderBottom: `2px solid ${getCurrentColors().primary}`,
+          position: 'relative',
+          zIndex: 1000
         }}
       >
-        <Typography.Title 
-          level={3} 
-          style={{ 
-            margin: 0, 
-            color: getCurrentColors().primary,
-            fontWeight: '700'
-          }}
-        >
-          AI情绪识别
-        </Typography.Title>
+        {/* 标题区域 */}
+        <div style={{ flex: '0 0 auto' }}>
+          <Typography.Title
+            level={3}
+            style={{
+              margin: 0,
+              color: getCurrentColors().primary,
+              fontWeight: '700',
+              lineHeight: '80px',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            AI情绪识别
+          </Typography.Title>
+        </div>
 
-        <Menu
-          onClick={handleClick}
-          selectedKeys={[current]}
-          mode="horizontal"
-          style={{
-            borderBottom: 'none',
-            backgroundColor: 'transparent',
-            color: getCurrentColors().text
-          }}
-          theme="light"
-          items={[
-            {
-              key: 'recognition',
-              label: <Link to="/" style={{ color: getCurrentColors().text, fontWeight: current === 'recognition' ? '700' : '500' }}>情绪识别</Link>,
-            },
-            {
-              key: 'history',
-              label: <Link to="/history" style={{ color: getCurrentColors().text, fontWeight: current === 'history' ? '700' : '500' }}>历史记录</Link>,
-            },
-            {
-              key: 'analysis',
-              label: <Link to="/analysis" style={{ color: getCurrentColors().text, fontWeight: current === 'analysis' ? '700' : '500' }}>情绪分析</Link>,
-            },
-            {
-              key: 'profile',
-              label: <Link to="/profile" style={{ color: getCurrentColors().text, fontWeight: current === 'profile' ? '700' : '500' }}>个人中心</Link>,
-            },
-            {
-              key: 'admin',
-              label: <Link to="/admin" style={{ color: getCurrentColors().text, fontWeight: current === 'admin' ? '700' : '500' }}><TeamOutlined /> 后台管理</Link>,
-            },
-          ]}
-        />
+        {/* 导航区域 - 居中显示 */}
+        <div style={{
+          flex: '1 1 auto',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
+          padding: '0 24px'
+        }}>
+          <div style={{
+            position: 'relative',
+            height: '60px',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <GooeyNav
+              items={navItems}
+              activeIndex={getActiveIndex()}
+              onItemClick={handleNavItemClick}
+              particleCount={15}
+              particleDistances={[90, 10]}
+              particleR={100}
+              animationTime={600}
+              timeVariance={300}
+              colors={[1, 2, 3, 1, 2, 3, 1, 4]}
+              primaryColor={getCurrentColors().primary}
+              secondaryColor={getCurrentColors().secondary}
+              isDarkMode={isDarkMode}
+            />
+          </div>
+        </div>
 
-        <div>
+        {/* 用户操作区域 */}
+        <div style={{
+          flex: '0 0 auto',
+          display: 'flex',
+          alignItems: 'center',
+          height: '100%',
+          gap: '12px'
+        }}>
+          {/* 夜间模式切换按钮 */}
+          <Button
+            icon={isDarkMode ? <SunOutlined /> : <MoonOutlined />}
+            onClick={toggleDarkMode}
+            style={{
+              color: getCurrentColors().primary,
+              border: `1px solid ${getCurrentColors().primary}`,
+              background: 'transparent'
+            }}
+          >
+            {isDarkMode ? '日间' : '夜间'}
+          </Button>
+
           {isAuthenticated ? (
             <UserMenu />
           ) : (
-            <Space>
-              <Button 
+            <Space size="middle">
+              <Button
                 style={{
                   color: getCurrentColors().primary,
                   border: `1px solid ${getCurrentColors().primary}`
@@ -255,8 +363,8 @@ const AppNavigation = () => {
               >
                 注册
               </Button>
-              <Button 
-                type="primary" 
+              <Button
+                type="primary"
                 style={{
                   background: `linear-gradient(135deg, ${getCurrentColors().primary}, ${getCurrentColors().secondary})`,
                   border: 'none'
@@ -287,11 +395,11 @@ const AppNavigation = () => {
         </Routes>
       </Layout.Content>
 
-      <Layout.Footer 
+      <Layout.Footer
         style={{
-          background: 'rgba(255, 255, 255, 0.85)',
+          background: isDarkMode ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.85)',
           backdropFilter: 'blur(10px)',
-          color: getCurrentColors().text,
+          color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
           borderTop: `2px solid ${getCurrentColors().primary}`
         }}
       >
@@ -304,18 +412,30 @@ const AppNavigation = () => {
 // 主应用组件
 const App: React.FC = () => {
   const [emotion, setEmotion] = useState('neutral')
+  const { isDarkMode } = useDarkMode()
 
   console.log('App emotion state:', emotion);
 
   return (
     <AuthProvider>
-      <EmotionContext.Provider value={{ emotion, setEmotion }}>
-        <ConfigProvider locale={zhCN}>
-          <Router>
-            <AppNavigation />
-          </Router>
-        </ConfigProvider>
-      </EmotionContext.Provider>
+      <DarkModeProvider>
+        <EmotionContext.Provider value={{ emotion, setEmotion }}>
+          <ConfigProvider
+            locale={zhCN}
+            theme={{
+              algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
+              token: {
+                colorPrimary: isDarkMode ? '#177ddc' : undefined,
+                borderRadius: 8,
+              }
+            }}
+          >
+            <Router>
+              <AppNavigation />
+            </Router>
+          </ConfigProvider>
+        </EmotionContext.Provider>
+      </DarkModeProvider>
     </AuthProvider>
   )
 }

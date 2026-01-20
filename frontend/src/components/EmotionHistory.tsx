@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { Card, Typography, List, Tag, Empty, Button, DatePicker, Space, Popconfirm, message } from 'antd'
 import { ReloadOutlined, DeleteOutlined } from '@ant-design/icons'
-import { EmotionContext, emotionToColors } from '../App'
+import { EmotionContext, emotionToColors, emotionToColorsDark } from '../App'
+import { useDarkMode } from '../contexts/DarkModeContext'
 import { emotionService } from '../services/emotionService'
 import { EmotionRecord as EmotionRecordType } from '../services/emotionService'
 
@@ -15,10 +16,17 @@ const EmotionHistory: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const { emotion } = useContext(EmotionContext)
-  
+  const { isDarkMode } = useDarkMode()
+
   // 获取当前情绪对应的颜色
   const getCurrentColors = () => {
-    return emotionToColors[emotion.toLowerCase()] || emotionToColors.neutral
+    const colorMap = isDarkMode ? emotionToColorsDark : emotionToColors
+    return colorMap[emotion.toLowerCase()] || (isDarkMode ? emotionToColorsDark.neutral : emotionToColors.neutral)
+  }
+
+  // 获取卡片背景色
+  const getCardBackground = () => {
+    return isDarkMode ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.85)'
   }
 
   const fetchHistory = async () => {
@@ -79,10 +87,10 @@ const EmotionHistory: React.FC = () => {
         查看您的情绪分析历史记录，可以删除不想要的记录
       </Paragraph>
 
-      <Card 
+      <Card
         className="card"
         style={{
-          background: 'rgba(255, 255, 255, 0.85)',
+          background: getCardBackground(),
           backdropFilter: 'blur(10px)',
           border: `2px solid ${getCurrentColors().primary}`,
           borderRadius: '12px',
@@ -107,8 +115,8 @@ const EmotionHistory: React.FC = () => {
           >
             刷新记录
           </Button>
-          <RangePicker 
-            placeholder={['开始日期', '结束日期']} 
+          <RangePicker
+            placeholder={['开始日期', '结束日期']}
             style={{
               border: `2px solid ${getCurrentColors().secondary}`,
               borderRadius: '8px',
@@ -118,10 +126,10 @@ const EmotionHistory: React.FC = () => {
         </Space>
 
         {error && (
-          <div 
-            style={{ 
-              color: getCurrentColors().primary, 
-              marginBottom: 16, 
+          <div
+            style={{
+              color: getCurrentColors().primary,
+              marginBottom: 16,
               fontWeight: '500'
             }}
           >
@@ -133,10 +141,10 @@ const EmotionHistory: React.FC = () => {
           className="history-list"
           dataSource={records}
           loading={loading}
-          locale={{ 
-            emptyText: <Empty 
-              description={<span style={{ color: getCurrentColors().text }}>暂无情绪分析记录</span>} 
-            /> 
+          locale={{
+            emptyText: <Empty
+              description={<span style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>暂无情绪分析记录</span>}
+            />
           }}
           pagination={{
             current: currentPage,
@@ -148,101 +156,105 @@ const EmotionHistory: React.FC = () => {
             showSizeChanger: true,
             pageSizeOptions: ['5', '10', '20'],
             style: {
-              color: getCurrentColors().text,
+              color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
               marginTop: '16px'
             }
           }}
-          renderItem={(record) => (
-            <List.Item
-              key={record._id}
-              actions={[
-                <Tag 
-                  className={record.emotion.toLowerCase()}
-                  style={{
-                    background: `linear-gradient(135deg, ${emotionToColors[record.emotion.toLowerCase()].primary}, ${emotionToColors[record.emotion.toLowerCase()].secondary})`,
-                    color: '#FFFFFF',
-                    border: 'none',
-                    fontWeight: '700',
-                    marginRight: '8px'
-                  }}
-                >
-                  {record.emotion}
-                </Tag>,
-                <span 
-                  style={{ 
-                    color: emotionToColors[record.emotion.toLowerCase()].primary, 
-                    fontWeight: '700',
-                    marginRight: '8px'
-                  }}
-                >
-                  {record.score.toFixed(0)}%
-                </span>,
-                <Popconfirm
-                  title="确定要删除这条记录吗？"
-                  onConfirm={() => handleDelete(record._id)}
-                  okText="确定"
-                  cancelText="取消"
-                  okButtonProps={{
-                    style: {
-                      background: `linear-gradient(135deg, ${getCurrentColors().primary}, ${getCurrentColors().secondary})`,
-                      border: 'none',
-                      color: '#FFFFFF'
-                    }
-                  }}
-                >
-                  <Button
-                    icon={<DeleteOutlined />}
+          renderItem={(record) => {
+            const recordColorMap = isDarkMode ? emotionToColorsDark : emotionToColors
+            const recordColors = recordColorMap[record.emotion.toLowerCase()] || (isDarkMode ? emotionToColorsDark.neutral : emotionToColors.neutral)
+            return (
+              <List.Item
+                key={record._id}
+                actions={[
+                  <Tag
+                    className={record.emotion.toLowerCase()}
                     style={{
-                      color: '#ff4d4f',
-                      borderColor: '#ff4d4f'
+                      background: `linear-gradient(135deg, ${recordColors.primary}, ${recordColors.secondary})`,
+                      color: '#FFFFFF',
+                      border: 'none',
+                      fontWeight: '700',
+                      marginRight: '8px'
                     }}
                   >
-                    删除
-                  </Button>
-                </Popconfirm>
-              ]}
-              style={{
-                borderBottom: `1px solid ${getCurrentColors().secondary}`,
-                transition: 'all 0.3s ease',
-                padding: '16px 0'
-              }}
-            >
-              <List.Item.Meta
-                title={
-                  <div 
-                    style={{ 
-                      color: getCurrentColors().text, 
-                      fontWeight: '600',
-                      marginBottom: '4px'
+                    {record.emotion}
+                  </Tag>,
+                  <span
+                    style={{
+                      color: recordColors.primary,
+                      fontWeight: '700',
+                      marginRight: '8px'
                     }}
                   >
-                    {record.content?.substring(0, 50)}{record.content?.length && record.content.length > 50 ? '...' : ''}
-                  </div>
-                }
-                description={
-                  <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                    <div 
-                      style={{ 
-                        color: getCurrentColors().text,
-                        opacity: 0.8,
-                        fontSize: '14px'
+                    {record.score.toFixed(0)}%
+                  </span>,
+                  <Popconfirm
+                    title="确定要删除这条记录吗？"
+                    onConfirm={() => handleDelete(record._id)}
+                    okText="确定"
+                    cancelText="取消"
+                    okButtonProps={{
+                      style: {
+                        background: `linear-gradient(135deg, ${getCurrentColors().primary}, ${getCurrentColors().secondary})`,
+                        border: 'none',
+                        color: '#FFFFFF'
+                      }
+                    }}
+                  >
+                    <Button
+                      icon={<DeleteOutlined />}
+                      style={{
+                        color: '#ff4d4f',
+                        borderColor: '#ff4d4f'
                       }}
                     >
-                      识别类型: {record.type}
-                    </div>
-                    <div 
-                      style={{ 
-                        color: `${getCurrentColors().text}80`, 
-                        fontSize: 12 
+                      删除
+                    </Button>
+                  </Popconfirm>
+                ]}
+                style={{
+                  borderBottom: `1px solid ${getCurrentColors().secondary}`,
+                  transition: 'all 0.3s ease',
+                  padding: '16px 0'
+                }}
+              >
+                <List.Item.Meta
+                  title={
+                    <div
+                      style={{
+                        color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
+                        fontWeight: '600',
+                        marginBottom: '4px'
                       }}
                     >
-                      {new Date(record.createdAt).toLocaleString()}
+                      {record.content?.substring(0, 50)}{record.content?.length && record.content.length > 50 ? '...' : ''}
                     </div>
-                  </Space>
-                }
-              />
-            </List.Item>
-          )}
+                  }
+                  description={
+                    <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                      <div
+                        style={{
+                          color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
+                          opacity: 0.8,
+                          fontSize: '14px'
+                        }}
+                      >
+                        识别类型: {record.type}
+                      </div>
+                      <div
+                        style={{
+                          color: isDarkMode ? '#b0b0b0' : `${getCurrentColors().text}80`,
+                          fontSize: 12
+                        }}
+                      >
+                        {new Date(record.createdAt).toLocaleString()}
+                      </div>
+                    </Space>
+                  }
+                />
+              </List.Item>
+            )
+          }}
         />
       </Card>
     </div>
