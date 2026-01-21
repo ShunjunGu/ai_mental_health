@@ -65,6 +65,16 @@ const AdminDashboard: React.FC = () => {
     return isDarkMode ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)';
   };
 
+  // 获取输入框背景色
+  const getInputBackground = () => {
+    return isDarkMode ? 'var(--bg-secondary)' : 'rgba(255, 255, 255, 0.95)';
+  };
+
+  // 获取输入框边框色
+  const getInputBorderColor = () => {
+    return isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)';
+  };
+
   // 获取统计卡片背景色
   const getStatisticBackground = (color: string) => {
     if (isDarkMode) {
@@ -388,13 +398,18 @@ const AdminDashboard: React.FC = () => {
         </Row>
 
         {/* 搜索和筛选 */}
-        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flex: 1 }}>
             <Input.Search
               placeholder="搜索姓名、邮箱、学号/工号、电话"
               allowClear
               size="large"
-              style={{ width: 450 }}
+              style={{
+                width: 450,
+                maxWidth: '100%',
+                background: getInputBackground(),
+                borderColor: getInputBorderColor()
+              }}
               onSearch={() => setSearchText(searchText)}
               onChange={(e) => setSearchText(e.target.value)}
               enterButton={
@@ -407,7 +422,10 @@ const AdminDashboard: React.FC = () => {
               placeholder="筛选角色"
               allowClear
               size="large"
-              style={{ width: 150 }}
+              style={{
+                width: 150,
+                background: getInputBackground()
+              }}
               onChange={(value) => setRoleFilter(value)}
             >
               <Option value="student">学生</Option>
@@ -415,7 +433,7 @@ const AdminDashboard: React.FC = () => {
               <Option value="admin">管理员</Option>
             </Select>
           </div>
-          <span style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text }}>
+          <span style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text, whiteSpace: 'nowrap' }}>
             显示 {filteredUsers.length} / 共 {users.length} 位用户
           </span>
         </div>

@@ -105,7 +105,7 @@ const EmotionRecognition: React.FC = () => {
               fontSize: '16px',
               padding: '12px',
               color: isDarkMode ? '#e0e0e0' : getCurrentColors().text,
-              background: isDarkMode ? 'rgba(42, 42, 42, 0.95)' : 'rgba(255, 255, 255, 0.9)',
+              background: isDarkMode ? 'var(--bg-secondary)' : 'rgba(255, 255, 255, 0.9)',
               transition: 'border-color 0.3s ease'
             }}
 

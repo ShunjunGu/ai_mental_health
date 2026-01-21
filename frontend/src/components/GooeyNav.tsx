@@ -58,14 +58,21 @@ const GooeyNav: React.FC<GooeyNavProps> = ({
     const rect = activeItem.getBoundingClientRect()
     const containerRect = container.getBoundingClientRect()
 
+    // 计算精确的尺寸和位置（考虑3px的inset偏移）
+    const offset = 3
+    const effectLeft = rect.left - containerRect.left + offset
+    const effectTop = rect.top - containerRect.top + offset
+    const effectWidth = rect.width - offset * 2
+    const effectHeight = rect.height - offset * 2
+
     // 创建粒子效果
     const navEffect = document.createElement('div')
     navEffect.className = 'effect active'
     navEffect.style.position = 'absolute'
-    navEffect.style.left = `${rect.left - containerRect.left}px`
-    navEffect.style.top = `${rect.top - containerRect.top}px`
-    navEffect.style.width = `${rect.width}px`
-    navEffect.style.height = `${rect.height}px`
+    navEffect.style.left = `${effectLeft}px`
+    navEffect.style.top = `${effectTop}px`
+    navEffect.style.width = `${effectWidth}px`
+    navEffect.style.height = `${effectHeight}px`
 
     const filterEffect = document.createElement('div')
     filterEffect.className = 'effect filter'

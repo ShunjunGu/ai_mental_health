@@ -210,7 +210,7 @@ const UserMenu = () => {
             marginRight: '8px'
           }}
         />
-        <span>{user?.name || '用户'}</span>
+        <span style={{ color: 'var(--text-primary)' }}>{user?.name || '用户'}</span>
       </Space>
     </Dropdown>
   )

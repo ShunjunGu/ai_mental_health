@@ -34,7 +34,7 @@ const UserProfile: React.FC = () => {
 
   // 获取输入框背景色
   const getInputBackground = () => {
-    return isDarkMode ? 'rgba(42, 42, 42, 0.95)' : 'rgba(255, 255, 255, 0.9)'
+    return isDarkMode ? 'var(--bg-secondary)' : 'rgba(255, 255, 255, 0.9)'
   }
 
   // 使用真实用户信息或默认值
