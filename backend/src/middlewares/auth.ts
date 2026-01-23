@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/jwt';
 import { UserRole } from '../types';
+import { userStore } from '../utils/userStore';
 
 // 认证中间件
 export const authenticate = (req: Request, res: Response, next: NextFunction): void => {
@@ -15,6 +16,14 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
 
   if (!decoded) {
     res.status(401).json({ message: '无效的认证令牌' });
+    return;
+  }
+
+  // 验证用户是否仍然存在
+  const userExists = userStore.userExists(decoded.userId);
+
+  if (!userExists) {
+    res.status(401).json({ message: '用户不存在或已被删除' });
     return;
   }
 

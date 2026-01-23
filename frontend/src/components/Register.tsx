@@ -2,8 +2,9 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Card, Typography, Form, Input, Button, message, Divider, Row, Col, Select } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined, TeamOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import { EmotionContext, emotionToColors } from '../App';
+import { EmotionContext, emotionToColors, emotionToColorsDark } from '../App';
 import { useAuth } from '../contexts/AuthContext';
+import { useDarkMode } from '../contexts/DarkModeContext';
 
 const { Title, Paragraph } = Typography;
 const { Password } = Input;
@@ -15,6 +16,7 @@ const Register: React.FC = () => {
   const navigate = useNavigate();
   const { emotion } = useContext(EmotionContext);
   const { register } = useAuth();
+  const { isDarkMode } = useDarkMode();
   
   // 获取当前角色值（添加默认值保护）
   const role = Form.useWatch(['role'], form) || 'student';
@@ -38,7 +40,18 @@ const Register: React.FC = () => {
 
   // 获取当前情绪对应的颜色
   const getCurrentColors = () => {
-    return emotionToColors[emotion.toLowerCase()] || emotionToColors.neutral;
+    const colorMap = isDarkMode ? emotionToColorsDark : emotionToColors;
+    return colorMap[emotion.toLowerCase()] || (isDarkMode ? emotionToColorsDark.neutral : emotionToColors.neutral);
+  };
+
+  // 获取卡片背景色
+  const getCardBackground = () => {
+    return isDarkMode ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.9)';
+  };
+
+  // 获取输入框背景色
+  const getInputBackground = () => {
+    return isDarkMode ? 'var(--bg-secondary)' : 'rgba(255, 255, 255, 0.9)';
   };
 
   // 处理注册提交
@@ -68,7 +81,7 @@ const Register: React.FC = () => {
         style={{
           width: '100%',
           maxWidth: '600px',
-          background: 'rgba(255, 255, 255, 0.9)',
+          background: getCardBackground(),
           backdropFilter: 'blur(10px)',
           border: `2px solid ${getCurrentColors().primary}`,
           borderRadius: '16px',
@@ -118,7 +131,7 @@ const Register: React.FC = () => {
                     border: `2px solid ${getCurrentColors().secondary}`,
                     borderRadius: '8px',
                     color: getCurrentColors().text,
-                    background: 'rgba(255, 255, 255, 0.9)',
+                    background: getInputBackground(),
                     transition: 'border-color 0.3s ease'
                   }}
                 />
@@ -143,7 +156,7 @@ const Register: React.FC = () => {
                     border: `2px solid ${getCurrentColors().secondary}`,
                     borderRadius: '8px',
                     color: getCurrentColors().text,
-                    background: 'rgba(255, 255, 255, 0.9)',
+                    background: getInputBackground(),
                     transition: 'border-color 0.3s ease'
                   }}
                 />
@@ -168,7 +181,7 @@ const Register: React.FC = () => {
                     border: `2px solid ${getCurrentColors().secondary}`,
                     borderRadius: '8px',
                     color: getCurrentColors().text,
-                    background: 'rgba(255, 255, 255, 0.9)',
+                    background: getInputBackground(),
                     transition: 'border-color 0.3s ease'
                   }}
                 />
@@ -190,7 +203,7 @@ const Register: React.FC = () => {
                     border: `2px solid ${getCurrentColors().secondary}`,
                     borderRadius: '8px',
                     color: getCurrentColors().text,
-                    background: 'rgba(255, 255, 255, 0.9)',
+                    background: getInputBackground(),
                     transition: 'border-color 0.3s ease'
                   }}
                 />
@@ -212,13 +225,12 @@ const Register: React.FC = () => {
                     border: `2px solid ${getCurrentColors().secondary}`,
                     borderRadius: '8px',
                     color: getCurrentColors().text,
-                    background: 'rgba(255, 255, 255, 0.9)',
+                    background: getInputBackground(),
                     transition: 'border-color 0.3s ease'
                   }}
                 >
                   <Option value="student">学生</Option>
                   <Option value="teacher">教师</Option>
-                  <Option value="counselor">心理咨询师</Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -234,7 +246,7 @@ const Register: React.FC = () => {
                     border: `2px solid ${getCurrentColors().secondary}`,
                     borderRadius: '8px',
                     color: getCurrentColors().text,
-                    background: 'rgba(255, 255, 255, 0.9)',
+                    background: getInputBackground(),
                     transition: 'border-color 0.3s ease'
                   }}
                 >
@@ -264,7 +276,7 @@ const Register: React.FC = () => {
                     border: `2px solid ${getCurrentColors().secondary}`,
                     borderRadius: '8px',
                     color: getCurrentColors().text,
-                    background: 'rgba(255, 255, 255, 0.9)',
+                    background: getInputBackground(),
                     transition: 'border-color 0.3s ease'
                   }}
                 />
@@ -283,7 +295,7 @@ const Register: React.FC = () => {
                     border: `2px solid ${getCurrentColors().secondary}`,
                     borderRadius: '8px',
                     color: getCurrentColors().text,
-                    background: 'rgba(255, 255, 255, 0.9)',
+                    background: getInputBackground(),
                     transition: 'border-color 0.3s ease'
                   }}
                 />
@@ -306,7 +318,7 @@ const Register: React.FC = () => {
                       border: `2px solid ${getCurrentColors().secondary}`,
                       borderRadius: '8px',
                       color: getCurrentColors().text,
-                      background: 'rgba(255, 255, 255, 0.9)',
+                      background: getInputBackground(),
                       transition: 'border-color 0.3s ease'
                     }}
                   />
@@ -324,7 +336,7 @@ const Register: React.FC = () => {
                       border: `2px solid ${getCurrentColors().secondary}`,
                       borderRadius: '8px',
                       color: getCurrentColors().text,
-                      background: 'rgba(255, 255, 255, 0.9)',
+                      background: getInputBackground(),
                       transition: 'border-color 0.3s ease'
                     }}
                   />
@@ -348,7 +360,7 @@ const Register: React.FC = () => {
                       border: `2px solid ${getCurrentColors().secondary}`,
                       borderRadius: '8px',
                       color: getCurrentColors().text,
-                      background: 'rgba(255, 255, 255, 0.9)',
+                      background: getInputBackground(),
                       transition: 'border-color 0.3s ease'
                     }}
                   />

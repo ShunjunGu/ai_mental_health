@@ -383,7 +383,6 @@ const AppNavigation = () => {
           {/* 公共路由 */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/admin" element={<AdminDashboard />} />
 
           {/* 受保护的路由 */}
           <Route path="/" element={<PrivateRoute />}>
@@ -391,6 +390,7 @@ const AppNavigation = () => {
             <Route path="history" element={<EmotionHistory />} />
             <Route path="analysis" element={<EmotionAnalysis />} />
             <Route path="profile" element={<UserProfile />} />
+            <Route path="admin" element={<AdminDashboard />} />
           </Route>
         </Routes>
       </Layout.Content>

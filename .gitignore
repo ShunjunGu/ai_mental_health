@@ -57,3 +57,17 @@ Thumbs.db
 # package-lock.json
 # yarn.lock
 # pnpm-lock.yaml
+
+# Data files - sensitive user data and runtime data
+backend/data/
+data/
+*.json.bak
+
+# Temporary and build artifacts
+backend/nul
+backend/scripts/
+backend/dist/
+frontend/dist/
+
+# TypeScript build cache
+*.tsbuildinfo

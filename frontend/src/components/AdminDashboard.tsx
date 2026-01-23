@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Card, Table, Typography, Input, Select, Tag, message, Row, Col, Statistic, Button, Spin, Space } from 'antd';
-import { SearchOutlined, UserOutlined, TeamOutlined, LoginOutlined } from '@ant-design/icons';
+import { Card, Table, Typography, Input, Select, Tag, message, Row, Col, Statistic, Button, Spin, Space, Modal } from 'antd';
+import { SearchOutlined, UserOutlined, TeamOutlined, LoginOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { EmotionContext, emotionToColors, emotionToColorsDark } from '../App';
 import { useDarkMode } from '../contexts/DarkModeContext';
@@ -49,6 +49,13 @@ const AdminDashboard: React.FC = () => {
   const [dataLoading, setDataLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [roleFilter, setRoleFilter] = useState<string | undefined>();
+  const [classFilter, setClassFilter] = useState<string | undefined>();
+  const [gradeFilter, setGradeFilter] = useState<string | undefined>();
+  const [genderFilter, setGenderFilter] = useState<string | undefined>();
+  // 移除用户相关状态
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const { emotion } = useContext(EmotionContext);
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { isDarkMode } = useDarkMode();
@@ -216,6 +223,39 @@ const AdminDashboard: React.FC = () => {
     fetchAllUsers();
   }, []);
 
+  // 打开删除确认对话框
+  const showDeleteConfirm = (user: User) => {
+    setUserToDelete(user);
+    setDeleteModalVisible(true);
+  };
+
+  // 关闭删除确认对话框
+  const handleCancel = () => {
+    setDeleteModalVisible(false);
+    setUserToDelete(null);
+    setConfirmLoading(false);
+  };
+
+  // 确认删除用户
+  const handleDelete = async () => {
+    if (!userToDelete) return;
+
+    setConfirmLoading(true);
+    try {
+      await api.delete(`/api/users/${userToDelete._id}`);
+      message.success('用户删除成功');
+      setDeleteModalVisible(false);
+      // 重新获取用户列表
+      await fetchAllUsers();
+    } catch (error: any) {
+      console.error('删除用户失败:', error);
+      message.error(error.response?.data?.message || '删除用户失败');
+    } finally {
+      setConfirmLoading(false);
+      setUserToDelete(null);
+    }
+  };
+
   // 搜索和筛选
   useEffect(() => {
     let result = users;
@@ -237,8 +277,23 @@ const AdminDashboard: React.FC = () => {
       result = result.filter(user => user.role === roleFilter);
     }
 
+    // 班级筛选
+    if (classFilter) {
+      result = result.filter(user => user.class === classFilter);
+    }
+
+    // 年级筛选
+    if (gradeFilter) {
+      result = result.filter(user => user.grade === gradeFilter);
+    }
+
+    // 性别筛选
+    if (genderFilter) {
+      result = result.filter(user => user.gender === genderFilter);
+    }
+
     setFilteredUsers(result);
-  }, [searchText, roleFilter, users]);
+  }, [searchText, roleFilter, classFilter, gradeFilter, genderFilter, users]);
 
   // 表格列定义
   const columns: ColumnsType<User> = [
@@ -318,6 +373,43 @@ const AdminDashboard: React.FC = () => {
       width: 140,
       render: (classInfo?: string) => classInfo || '-',
     },
+    {
+      title: '操作',
+      key: 'action',
+      width: 120,
+      render: (_, record) => {
+        // 判断是否可以删除该用户
+        // 1. 不能删除自己
+        // 2. 普通管理员不能删除管理员账号
+        // 3. 超级管理员（superadmin@test.edu.cn）可以删除管理员账号，但不能删除其他超级管理员
+        const isCurrentUserSuperAdmin = user?.email === 'superadmin@test.edu.cn';
+        const isUserToDeleteSuperAdmin = record.email === 'superadmin@test.edu.cn';
+        const canDelete = 
+          record._id !== user?._id && 
+          (record.role !== 'admin' || 
+           (isCurrentUserSuperAdmin && !isUserToDeleteSuperAdmin));
+        
+        return (
+          <Space size="middle">
+            <Button
+              danger
+              type="text"
+              size="small"
+              icon={<DeleteOutlined />}
+              onClick={() => showDeleteConfirm(record)}
+              disabled={!canDelete}
+              title={!canDelete ? (
+                record._id === user?._id ? '不能删除自己的账号' :
+                record.email === 'superadmin@test.edu.cn' ? '不能删除其他超级管理员' :
+                '只有超级管理员才能删除管理员账号'
+              ) : ''}
+            >
+              移除
+            </Button>
+          </Space>
+        );
+      },
+    },
   ];
 
   // 统计数据
@@ -325,6 +417,7 @@ const AdminDashboard: React.FC = () => {
     total: users.length,
     students: users.filter(u => u.role === 'student').length,
     teachers: users.filter(u => u.role === 'teacher').length,
+    admins: users.filter(u => u.role === 'admin').length,
   };
 
   return (
@@ -395,11 +488,23 @@ const AdminDashboard: React.FC = () => {
               }}
             />
           </Col>
+          <Col span={6}>
+            <Statistic
+              title={<span style={{ color: isDarkMode ? '#b0b0b0' : 'inherit' }}>管理员</span>}
+              value={statistics.admins}
+              valueStyle={{ color: '#ff4d4f' }}
+              style={{
+                background: getStatisticBackground('rgba(255, 77, 79, 0.1)'),
+                padding: '16px',
+                borderRadius: '8px',
+              }}
+            />
+          </Col>
         </Row>
 
         {/* 搜索和筛选 */}
-        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flex: 1 }}>
+        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '16px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flex: 1, flexWrap: 'wrap' }}>
             <Input.Search
               placeholder="搜索姓名、邮箱、学号/工号、电话"
               allowClear
@@ -432,6 +537,48 @@ const AdminDashboard: React.FC = () => {
               <Option value="teacher">教师</Option>
               <Option value="admin">管理员</Option>
             </Select>
+            <Select
+              placeholder="筛选性别"
+              allowClear
+              size="large"
+              style={{
+                width: 150,
+                background: getInputBackground()
+              }}
+              onChange={(value) => setGenderFilter(value)}
+            >
+              <Option value="male">男</Option>
+              <Option value="female">女</Option>
+              <Option value="other">其他</Option>
+            </Select>
+            <Select
+              placeholder="筛选年级"
+              allowClear
+              size="large"
+              style={{
+                width: 150,
+                background: getInputBackground()
+              }}
+              onChange={(value) => setGradeFilter(value)}
+            >
+              {Array.from(new Set(users.filter(u => u.grade).map(u => u.grade))).map(grade => (
+                <Option key={grade} value={grade}>{grade}</Option>
+              ))}
+            </Select>
+            <Select
+              placeholder="筛选班级"
+              allowClear
+              size="large"
+              style={{
+                width: 150,
+                background: getInputBackground()
+              }}
+              onChange={(value) => setClassFilter(value)}
+            >
+              {Array.from(new Set(users.filter(u => u.class).map(u => u.class))).map(className => (
+                <Option key={className} value={className}>{className}</Option>
+              ))}
+            </Select>
           </div>
           <span style={{ color: isDarkMode ? '#e0e0e0' : getCurrentColors().text, whiteSpace: 'nowrap' }}>
             显示 {filteredUsers.length} / 共 {users.length} 位用户
@@ -457,6 +604,44 @@ const AdminDashboard: React.FC = () => {
             borderRadius: '8px',
           }}
         />
+
+        {/* 删除确认对话框 */}
+        <Modal
+          title="确认删除"
+          open={deleteModalVisible}
+          onOk={handleDelete}
+          confirmLoading={confirmLoading}
+          onCancel={handleCancel}
+          okText="确认"
+          cancelText="取消"
+          okButtonProps={{
+            danger: true,
+          }}
+          style={{
+            borderRadius: '16px',
+          }}
+          bodyStyle={{
+            background: getCardBackground(),
+            borderBottom: `1px solid ${getInputBorderColor()}`,
+          }}
+          headerStyle={{
+            background: getCardBackground(),
+            borderBottom: `1px solid ${getInputBorderColor()}`,
+            borderRadius: '16px 16px 0 0',
+          }}
+          footerStyle={{
+            background: getCardBackground(),
+            borderTop: `1px solid ${getInputBorderColor()}`,
+            borderRadius: '0 0 16px 16px',
+          }}
+        >
+          {userToDelete && (
+            <div>
+              <p style={{ marginBottom: '16px' }}>确定要删除用户 <strong>{userToDelete.name}</strong> 吗？</p>
+              <p style={{ marginBottom: '0', color: '#ff4d4f' }}>此操作不可恢复，请谨慎操作！</p>
+            </div>
+          )}
+        </Modal>
       </Card>
     </div>
   );

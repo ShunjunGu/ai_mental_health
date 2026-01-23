@@ -2,8 +2,9 @@ import React, { useState, useContext } from 'react';
 import { Card, Typography, Form, Input, Button, message, Divider } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { EmotionContext, emotionToColors } from '../App';
+import { EmotionContext, emotionToColors, emotionToColorsDark } from '../App';
 import { useAuth } from '../contexts/AuthContext';
+import { useDarkMode } from '../contexts/DarkModeContext';
 
 const { Title, Paragraph } = Typography;
 const { Password } = Input;
@@ -15,10 +16,22 @@ const Login: React.FC = () => {
   const location = useLocation();
   const { emotion } = useContext(EmotionContext);
   const { login } = useAuth();
+  const { isDarkMode } = useDarkMode();
 
   // 获取当前情绪对应的颜色
   const getCurrentColors = () => {
-    return emotionToColors[emotion.toLowerCase()] || emotionToColors.neutral;
+    const colorMap = isDarkMode ? emotionToColorsDark : emotionToColors;
+    return colorMap[emotion.toLowerCase()] || (isDarkMode ? emotionToColorsDark.neutral : emotionToColors.neutral);
+  };
+
+  // 获取卡片背景色
+  const getCardBackground = () => {
+    return isDarkMode ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.9)';
+  };
+
+  // 获取输入框背景色
+  const getInputBackground = () => {
+    return isDarkMode ? 'var(--bg-secondary)' : 'rgba(255, 255, 255, 0.9)';
   };
 
   // 处理登录提交
@@ -51,7 +64,7 @@ const Login: React.FC = () => {
         style={{
           width: '100%',
           maxWidth: '400px',
-          background: 'rgba(255, 255, 255, 0.9)',
+          background: getCardBackground(),
           backdropFilter: 'blur(10px)',
           border: `2px solid ${getCurrentColors().primary}`,
           borderRadius: '16px',
@@ -101,7 +114,7 @@ const Login: React.FC = () => {
                 border: `2px solid ${getCurrentColors().secondary}`,
                 borderRadius: '8px',
                 color: getCurrentColors().text,
-                background: 'rgba(255, 255, 255, 0.9)',
+                background: getInputBackground(),
                 transition: 'border-color 0.3s ease'
               }}
             />
@@ -122,7 +135,7 @@ const Login: React.FC = () => {
                 border: `2px solid ${getCurrentColors().secondary}`,
                 borderRadius: '8px',
                 color: getCurrentColors().text,
-                background: 'rgba(255, 255, 255, 0.9)',
+                background: getInputBackground(),
                 transition: 'border-color 0.3s ease'
               }}
             />

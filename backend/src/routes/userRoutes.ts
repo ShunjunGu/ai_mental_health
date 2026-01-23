@@ -6,7 +6,8 @@ import {
   getCurrentUser,
   updateUser,
   changePassword,
-  getAllUsers
+  getAllUsers,
+  deleteUser
 } from '../controllers/userController';
 
 const router = express.Router();
@@ -28,5 +29,8 @@ router.put('/change-password', authenticate, changePassword);
 
 // 获取所有用户（需要认证，仅用于后台管理）
 router.get('/all', authenticate, getAllUsers);
+
+// 删除用户（需要认证）
+router.delete('/:id', authenticate, deleteUser);
 
 export default router;
