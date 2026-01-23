@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 // 导入模型训练函数，但不立即执行
 import { trainModel } from './services/emotionRecognitionService';
+import { errorHandler } from './middlewares/validation';
 
 // 加载环境变量
 dotenv.config();
@@ -94,6 +95,17 @@ app.use('/api/teacher-support', teacherDecisionSupportRoutes);
 app.get('/health', (req, res) => {
   res.status(200).json({ message: 'AI校园心理健康平台后端服务运行正常' });
 });
+
+// 404处理
+app.use((req, res) => {
+  res.status(404).json({
+    message: '请求的资源不存在',
+    path: req.path
+  });
+});
+
+// 全局错误处理中间件（必须放在所有路由之后）
+app.use(errorHandler);
 
 // 连接数据库
 const connectDB = async () => {

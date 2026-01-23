@@ -1,5 +1,6 @@
 import express from 'express';
-import { authenticate } from '../middlewares/auth';
+import { authenticate, isAdmin } from '../middlewares/auth';
+import { validateUserRegistration, validateUserLogin } from '../middlewares/validation';
 import {
   registerUser,
   loginUser,
@@ -12,11 +13,11 @@ import {
 
 const router = express.Router();
 
-// 用户注册
-router.post('/register', registerUser);
+// 用户注册（添加输入验证）
+router.post('/register', validateUserRegistration, registerUser);
 
-// 用户登录
-router.post('/login', loginUser);
+// 用户登录（添加输入验证）
+router.post('/login', validateUserLogin, loginUser);
 
 // 获取当前用户信息（需要认证）
 router.get('/me', authenticate, getCurrentUser);
@@ -27,10 +28,10 @@ router.put('/me', authenticate, updateUser);
 // 更改密码（需要认证）
 router.put('/change-password', authenticate, changePassword);
 
-// 获取所有用户（需要认证，仅用于后台管理）
-router.get('/all', authenticate, getAllUsers);
+// 获取所有用户（需要管理员权限）
+router.get('/all', authenticate, isAdmin, getAllUsers);
 
-// 删除用户（需要认证）
-router.delete('/:id', authenticate, deleteUser);
+// 删除用户（需要管理员权限）
+router.delete('/:id', authenticate, isAdmin, deleteUser);
 
 export default router;
