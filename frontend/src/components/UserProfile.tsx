@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { Card, Typography, Form, Input, Button, Avatar, Space, Row, Col, Switch, message } from 'antd'
 import { UserOutlined, EditOutlined, SaveOutlined, MailOutlined, PhoneOutlined, HomeOutlined } from '@ant-design/icons'
-import { EmotionContext, emotionToColors, emotionToColorsDark } from '../App'
+import { EmotionContext, emotionToColors, emotionToColorsDark } from '../contexts/EmotionContext'
 import { useAuth } from '../contexts/AuthContext'
 import { useDarkMode } from '../contexts/DarkModeContext'
 import { emotionService } from '../services/emotionService'
@@ -23,8 +23,20 @@ const UserProfile: React.FC = () => {
 
   // 获取当前情绪对应的颜色
   const getCurrentColors = () => {
+    const lowerEmotion = emotion.toLowerCase()
     const colorMap = isDarkMode ? emotionToColorsDark : emotionToColors
-    return colorMap[emotion.toLowerCase()] || (isDarkMode ? emotionToColorsDark.neutral : emotionToColors.neutral)
+
+    // 如果是初始状态（neutral），使用纯色背景
+    if (lowerEmotion === 'neutral') {
+      return {
+        background: isDarkMode ? '#0a1628' : '#ffffff',
+        primary: isDarkMode ? '#8b5cf6' : '#177ddc',
+        secondary: isDarkMode ? '#a78bfa' : '#3b82f6',
+        text: isDarkMode ? '#e8eaf0' : '#1a1a1a'
+      }
+    }
+
+    return colorMap[lowerEmotion] || (isDarkMode ? emotionToColorsDark.neutral : emotionToColors.neutral)
   }
 
   // 获取卡片背景色

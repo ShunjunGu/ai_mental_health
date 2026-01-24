@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Card, Table, Typography, Input, Select, Tag, message, Row, Col, Statistic, Button, Spin, Space, Modal } from 'antd';
 import { SearchOutlined, UserOutlined, TeamOutlined, LoginOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import { EmotionContext, emotionToColors, emotionToColorsDark } from '../App';
+import { EmotionContext, emotionToColors, emotionToColorsDark } from '../contexts/EmotionContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
 import { api } from '../services/authService';
 import { useAuth } from '../contexts/AuthContext';
@@ -13,7 +13,7 @@ const { Option } = Select;
 
 // 用户接口定义
 interface User {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   role: string;
@@ -63,8 +63,20 @@ const AdminDashboard: React.FC = () => {
 
   // 获取当前情绪对应的颜色
   const getCurrentColors = () => {
+    const lowerEmotion = emotion.toLowerCase();
     const colorMap = isDarkMode ? emotionToColorsDark : emotionToColors;
-    return colorMap[emotion.toLowerCase()] || (isDarkMode ? emotionToColorsDark.neutral : emotionToColors.neutral);
+
+    // 如果是初始状态（neutral），使用纯色背景
+    if (lowerEmotion === 'neutral') {
+      return {
+        background: isDarkMode ? '#0a1628' : '#ffffff',
+        primary: isDarkMode ? '#8b5cf6' : '#177ddc',
+        secondary: isDarkMode ? '#a78bfa' : '#3b82f6',
+        text: isDarkMode ? '#e8eaf0' : '#1a1a1a'
+      };
+    }
+
+    return colorMap[lowerEmotion] || (isDarkMode ? emotionToColorsDark.neutral : emotionToColors.neutral);
   };
 
   // 获取卡片背景色
@@ -242,7 +254,7 @@ const AdminDashboard: React.FC = () => {
 
     setConfirmLoading(true);
     try {
-      await api.delete(`/api/users/${userToDelete._id}`);
+      await api.delete(`/api/users/${userToDelete.id}`);
       message.success('用户删除成功');
       setDeleteModalVisible(false);
       // 重新获取用户列表
@@ -299,8 +311,8 @@ const AdminDashboard: React.FC = () => {
   const columns: ColumnsType<User> = [
     {
       title: 'ID',
-      dataIndex: '_id',
-      key: '_id',
+      dataIndex: 'id',
+      key: 'id',
       width: 80,
       render: (text: string) => <span style={{ fontSize: '12px', color: isDarkMode ? '#808080' : '#999' }}>{text.split('_')[1]}</span>,
     },
@@ -385,7 +397,7 @@ const AdminDashboard: React.FC = () => {
         const isCurrentUserSuperAdmin = user?.email === 'superadmin@test.edu.cn';
         const isUserToDeleteSuperAdmin = record.email === 'superadmin@test.edu.cn';
         const canDelete = 
-          record._id !== user?._id && 
+          record.id !== user?.id && 
           (record.role !== 'admin' || 
            (isCurrentUserSuperAdmin && !isUserToDeleteSuperAdmin));
         
@@ -399,7 +411,7 @@ const AdminDashboard: React.FC = () => {
               onClick={() => showDeleteConfirm(record)}
               disabled={!canDelete}
               title={!canDelete ? (
-                record._id === user?._id ? '不能删除自己的账号' :
+                record.id === user?.id ? '不能删除自己的账号' :
                 record.email === 'superadmin@test.edu.cn' ? '不能删除其他超级管理员' :
                 '只有超级管理员才能删除管理员账号'
               ) : ''}
@@ -589,8 +601,8 @@ const AdminDashboard: React.FC = () => {
         <Table
           columns={columns}
           dataSource={filteredUsers}
-          rowKey="_id"
-          loading={dataLoading}
+        rowKey="id"
+        loading={dataLoading}
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
@@ -623,16 +635,6 @@ const AdminDashboard: React.FC = () => {
           bodyStyle={{
             background: getCardBackground(),
             borderBottom: `1px solid ${getInputBorderColor()}`,
-          }}
-          headerStyle={{
-            background: getCardBackground(),
-            borderBottom: `1px solid ${getInputBorderColor()}`,
-            borderRadius: '16px 16px 0 0',
-          }}
-          footerStyle={{
-            background: getCardBackground(),
-            borderTop: `1px solid ${getInputBorderColor()}`,
-            borderRadius: '0 0 16px 16px',
           }}
         >
           {userToDelete && (

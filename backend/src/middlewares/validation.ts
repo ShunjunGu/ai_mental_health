@@ -27,7 +27,7 @@ const validate = (validations: any[]) => {
 };
 
 // 用户注册验证
-export const validateUserRegistration = async (req: Request, res: Response, next: NextFunction): void => {
+export const validateUserRegistration = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { name, email, password, role, phone, age } = req.body;
 
   const errors: string[] = [];
@@ -77,7 +77,7 @@ export const validateUserRegistration = async (req: Request, res: Response, next
 };
 
 // 用户登录验证
-export const validateUserLogin = async (req: Request, res: Response, next: NextFunction): void => {
+export const validateUserLogin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { email, password } = req.body;
 
   const errors: string[] = [];
@@ -104,7 +104,7 @@ export const validateUserLogin = async (req: Request, res: Response, next: NextF
 };
 
 // 情绪记录验证
-export const validateEmotionRecord = async (req: Request, res: Response, next: NextFunction): void => {
+export const validateEmotionRecord = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { type, content } = req.body;
 
   const errors: string[] = [];

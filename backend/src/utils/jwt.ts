@@ -11,10 +11,11 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 // 生成JWT令牌
 export const generateToken = (userId: string, role: string): string => {
   try {
+    const secret = process.env.JWT_SECRET || 'ai-mental-health-secret-key-change-in-production';
     const token = jwt.sign(
       { userId, role },
-      JWT_SECRET,
-      { expiresIn: JWT_EXPIRES_IN }
+      secret,
+      { expiresIn: '24h' }
     );
     return token;
   } catch (error) {

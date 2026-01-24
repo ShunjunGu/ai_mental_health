@@ -614,22 +614,33 @@ body {
 
 /* ========== 夜间模式样式 ========== */
 body.dark-mode {
-  --bg-primary: #1e1e1e;
-  --bg-secondary: #121212;
-  --bg-tertiary: #2a2a2a;
-  --text-primary: #e0e0e0;
-  --text-secondary: #b0b0b0;
-  --text-light: #808080;
-  --text-inverse: #1a1a1a;
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6);
-  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.8);
-  --shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.9);
+  /* 现代深蓝紫色基调 - 替代单调的灰色 */
+  --bg-primary: #1a1f35;
+  --bg-secondary: linear-gradient(135deg, #0a1628 0%, #141830 100%);
+  --bg-tertiary: #242845;
+  --bg-solid: #0f1419;
+
+  /* 文字颜色 - 增强对比度 */
+  --text-primary: #e8eaf0;
+  --text-secondary: #a0a8c0;
+  --text-light: #6b7280;
+  --text-inverse: #0a1628;
+
+  /* 阴影 - 使用彩色阴影增强层次感 */
+  --shadow-sm: 0 2px 8px rgba(10, 22, 40, 0.5);
+  --shadow-md: 0 8px 24px rgba(10, 22, 40, 0.7);
+  --shadow-lg: 0 16px 48px rgba(10, 22, 40, 0.85);
+  --shadow-hover: 0 20px 60px rgba(23, 125, 220, 0.25);
+
+  /* 主色调渐变 - 更鲜艳的蓝紫渐变 */
+  --primary-gradient: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  --primary-gradient-hover: linear-gradient(135deg, #2563eb, #7c3aed);
 }
 
 body.dark-mode {
   background: var(--bg-secondary);
   color: var(--text-primary);
+  background-attachment: fixed;
 }
 
 /* 夜间模式 Layout */
@@ -639,9 +650,9 @@ body.dark-mode .layout {
 
 /* 夜间模式 Header */
 body.dark-mode .ant-layout-header {
-  background: rgba(30, 30, 30, 0.95) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  background: rgba(26, 31, 53, 0.95) !important;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.15);
+  box-shadow: 0 2px 8px rgba(10, 22, 40, 0.5);
 }
 
 /* 夜间模式 Logo */
@@ -666,7 +677,8 @@ body.dark-mode .ant-menu-item:hover {
 
 body.dark-mode .ant-menu-item-selected {
   color: var(--text-inverse) !important;
-  background: linear-gradient(135deg, #177ddc, #0958d9) !important;
+  background: var(--primary-gradient) !important;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
 /* 夜间模式内容区域 */
@@ -675,15 +687,15 @@ body.dark-mode .ant-layout-content {
 }
 
 body.dark-mode .site-layout-content {
-  background: rgba(30, 30, 30, 0.95);
+  background: rgba(26, 31, 53, 0.85);
   backdrop-filter: blur(10px);
   color: var(--text-primary);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.1);
 }
 
 body.dark-mode .site-layout-content:hover {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(10, 22, 40, 0.7);
+  border-color: rgba(139, 92, 246, 0.2);
 }
 
 /* 夜间模式标题 */
@@ -768,8 +780,9 @@ body.dark-mode .ant-input-search .ant-input:focus {
 }
 
 body.dark-mode .ant-input-search-button {
-  background: linear-gradient(135deg, #177ddc, #0958d9) !important;
+  background: var(--primary-gradient) !important;
   border-color: transparent !important;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
 body.dark-mode .ant-input-clear-icon {
@@ -781,8 +794,9 @@ body.dark-mode .ant-input-clear-icon:hover {
 }
 
 body.dark-mode .ant-input-search-button:hover {
-  background: linear-gradient(135deg, #0958d9, #0050b3) !important;
+  background: var(--primary-gradient-hover) !important;
   border-color: transparent !important;
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
 }
 
 /* 夜间模式按钮 */
@@ -799,14 +813,16 @@ body.dark-mode .ant-btn:hover {
 }
 
 body.dark-mode .ant-btn-primary {
-  background: linear-gradient(135deg, #177ddc, #0958d9);
+  background: var(--primary-gradient);
   border-color: transparent;
   color: white;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
 body.dark-mode .ant-btn-primary:hover {
-  background: linear-gradient(135deg, #0958d9, #0050b3);
+  background: var(--primary-gradient-hover);
   color: white;
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
 }
 
 /* 夜间模式标签 */
@@ -853,8 +869,8 @@ body.dark-mode .chart-container {
 
 /* 夜间模式 Footer */
 body.dark-mode .ant-layout-footer {
-  background: rgba(30, 30, 30, 0.95) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(26, 31, 53, 0.95) !important;
+  border-top: 1px solid rgba(139, 92, 246, 0.15);
   color: var(--text-light);
 }
 
@@ -960,11 +976,11 @@ body.dark-mode .ant-tabs-tab:hover {
 }
 
 body.dark-mode .ant-tabs-tab-active {
-  color: #177ddc;
+  color: #8b5cf6;
 }
 
 body.dark-mode .ant-tabs-ink-bar {
-  background: #177ddc;
+  background: #8b5cf6;
 }
 
 /* 夜间模式 Select */
@@ -988,7 +1004,7 @@ body.dark-mode .ant-select-item {
 }
 
 body.dark-mode .ant-select-item-option-selected {
-  background: rgba(23, 125, 220, 0.2) !important;
+  background: rgba(139, 92, 246, 0.2) !important;
 }
 
 body.dark-mode .ant-select-item-option-active {
@@ -1040,16 +1056,16 @@ body.dark-mode .ant-pagination-item a {
 }
 
 body.dark-mode .ant-pagination-item:hover {
-  border-color: #177ddc;
+  border-color: #8b5cf6;
 }
 
 body.dark-mode .ant-pagination-item:hover a {
-  color: #177ddc;
+  color: #8b5cf6;
 }
 
 body.dark-mode .ant-pagination-item-active {
-  background: #177ddc;
-  border-color: #177ddc;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-color: transparent;
 }
 
 body.dark-mode .ant-pagination-item-active a {
@@ -1058,45 +1074,115 @@ body.dark-mode .ant-pagination-item-active a {
 
 /* ========== 情绪结果卡片夜间模式优化 ========== */
 body.dark-mode .emotion-result {
-  background: rgba(30, 30, 30, 0.95) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(26, 31, 53, 0.85) !important;
+  border-color: rgba(139, 92, 246, 0.2) !important;
+  box-shadow: 0 8px 24px rgba(10, 22, 40, 0.6);
+}
+
+body.dark-mode .emotion-result:hover {
+  box-shadow: 0 12px 32px rgba(139, 92, 246, 0.25);
+  border-color: rgba(139, 92, 246, 0.3);
 }
 
 body.dark-mode .emotion-result h4,
 body.dark-mode .emotion-result strong,
 body.dark-mode .emotion-result p,
 body.dark-mode .emotion-result span {
-  color: #e0e0e0 !important;
+  color: #e8eaf0 !important;
 }
 
 /* 情绪标签夜间模式优化 */
 body.dark-mode .emotion-result .ant-tag {
   color: white !important;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2);
+}
+
+/* 不同情绪的彩色阴影增强 */
+body.dark-mode .emotion-result.happy {
+  box-shadow: 0 8px 24px rgba(255, 152, 0, 0.15);
+}
+
+body.dark-mode .emotion-result.happy:hover {
+  box-shadow: 0 12px 32px rgba(255, 152, 0, 0.25);
+}
+
+body.dark-mode .emotion-result.sad {
+  box-shadow: 0 8px 24px rgba(66, 165, 245, 0.15);
+}
+
+body.dark-mode .emotion-result.sad:hover {
+  box-shadow: 0 12px 32px rgba(66, 165, 245, 0.25);
+}
+
+body.dark-mode .emotion-result.angry {
+  box-shadow: 0 8px 24px rgba(239, 83, 80, 0.15);
+}
+
+body.dark-mode .emotion-result.angry:hover {
+  box-shadow: 0 12px 32px rgba(239, 83, 80, 0.25);
+}
+
+body.dark-mode .emotion-result.fear {
+  box-shadow: 0 8px 24px rgba(171, 71, 188, 0.15);
+}
+
+body.dark-mode .emotion-result.fear:hover {
+  box-shadow: 0 12px 32px rgba(171, 71, 188, 0.25);
+}
+
+body.dark-mode .emotion-result.surprise {
+  box-shadow: 0 8px 24px rgba(102, 187, 106, 0.15);
+}
+
+body.dark-mode .emotion-result.surprise:hover {
+  box-shadow: 0 12px 32px rgba(102, 187, 106, 0.25);
+}
+
+body.dark-mode .emotion-result.neutral {
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.15);
+}
+
+body.dark-mode .emotion-result.neutral:hover {
+  box-shadow: 0 12px 32px rgba(139, 92, 246, 0.25);
 }
 
 /* 统计卡片夜间模式优化 */
 body.dark-mode .ant-statistic {
-  background: rgba(30, 30, 30, 0.95) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(26, 31, 53, 0.85) !important;
+  border-color: rgba(139, 92, 246, 0.15) !important;
+  box-shadow: 0 4px 12px rgba(10, 22, 40, 0.5);
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .ant-statistic:hover {
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.25);
 }
 
 body.dark-mode .ant-statistic .ant-statistic-title {
-  color: #b0b0b0 !important;
+  color: #a0a8c0 !important;
 }
 
 body.dark-mode .ant-statistic .ant-statistic-content {
-  color: #e0e0e0 !important;
+  color: #e8eaf0 !important;
 }
 
 /* 图表容器夜间模式优化 */
 body.dark-mode .chart-container {
-  background: rgba(30, 30, 30, 0.95) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(26, 31, 53, 0.85) !important;
+  border-color: rgba(139, 92, 246, 0.15) !important;
+  box-shadow: 0 4px 12px rgba(10, 22, 40, 0.5);
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .chart-container:hover {
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.25);
 }
 
 /* Empty 状态夜间模式优化 */
 body.dark-mode .ant-empty-description {
-  color: #b0b0b0 !important;
+  color: #a0a8c0 !important;
 }
 
 /* 响应式设计 */

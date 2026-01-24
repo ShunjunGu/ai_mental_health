@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { UserRole } from '../types';
 import { userStore, IUser } from '../utils/userStore';
+import { generateToken } from '../utils/jwt';
 
 // 生成下一个用户ID
 const getNextUserId = (): number => {
@@ -12,12 +12,7 @@ const getNextUserId = (): number => {
 
 let nextUserId = getNextUserId();
 
-// 生成JWT令牌的函数
-const generateToken = (userId: string, role: UserRole) => {
-  return jwt.sign({ userId, role }, process.env.JWT_SECRET || 'default-secret-key', {
-    expiresIn: '24h',
-  });
-};
+// 生成JWT令牌的函数已从 '../utils/jwt' 导入
 
 // 用户注册
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
@@ -184,11 +179,16 @@ export const getCurrentUser = async (req: Request, res: Response): Promise<void>
     }
 
     // 创建不包含密码的用户信息副本
-    const { password, comparePassword, ...userWithoutPassword } = user;
+    // 将 _id 映射为 id 以匹配前端接口
+    const { password, comparePassword, _id, ...userWithoutPassword } = user;
+    const userResponse = {
+      ...userWithoutPassword,
+      id: _id
+    };
 
     res.status(200).json({
       message: '获取用户信息成功',
-      user: userWithoutPassword
+      user: userResponse
     });
   } catch (error) {
     console.error('获取用户信息失败:', error);
@@ -227,11 +227,16 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     }
 
     // 创建不包含密码的用户信息副本
-    const { password, comparePassword, ...userWithoutPassword } = updatedUser;
+    // 将 _id 映射为 id 以匹配前端接口
+    const { password, comparePassword, _id, ...userWithoutPassword } = updatedUser;
+    const userResponse = {
+      ...userWithoutPassword,
+      id: _id
+    };
 
     res.status(200).json({
       message: '更新用户信息成功',
-      user: userWithoutPassword
+      user: userResponse
     });
   } catch (error) {
     console.error('更新用户信息失败:', error);
@@ -280,7 +285,11 @@ export const getAllUsers = async (req: Request, res: Response): Promise<void> =>
     console.log('用户列表:', users.map(user => ({ id: user._id, email: user.email, name: user.name })));
 
     // 返回用户信息，但不包含密码
-    const usersWithoutPasswords = users.map(({ password, comparePassword, ...user }) => user);
+    // 将 _id 映射为 id 以匹配前端接口
+    const usersWithoutPasswords = users.map(({ password, comparePassword, _id, ...user }) => ({
+      ...user,
+      id: _id
+    }));
 
     res.status(200).json({
       message: '获取用户列表成功',

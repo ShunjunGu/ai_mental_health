@@ -21,7 +21,7 @@ import teacherDecisionSupportRoutes from './routes/teacherDecisionSupportRoutes'
 const app = express();
 // 配置服务器端口
 // 使用.env文件中配置的固定端口
-const PORT = parseInt(process.env.PORT || '57214', 10); // 确保PORT是数字类型，默认使用57214端口
+const PORT = parseInt(process.env.PORT || '57215', 10); // 确保PORT是数字类型，默认使用57215端口
 
 // 中间件配置
 app.use(helmet());
