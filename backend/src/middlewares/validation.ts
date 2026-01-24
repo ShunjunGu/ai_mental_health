@@ -4,8 +4,8 @@ import { UserRole } from '../types';
 // 邮箱验证正则
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// 密码强度验证（至少8位，包含字母和数字）
-const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
+// 密码强度验证（至少8位，包含大小写字母、数字和特殊字符）
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 // 手机号验证（中国大陆）
 const phoneRegex = /^1[3-9]\d{9}$/;
@@ -41,8 +41,10 @@ export const validateUserRegistration = async (req: Request, res: Response, next
     errors.push('请输入有效的邮箱地址');
   }
 
-  if (!password || password.length < 6) {
-    errors.push('密码至少需要6个字符');
+  if (!password || password.length < 8) {
+    errors.push('密码至少需要8个字符，且包含大小写字母、数字和特殊字符');
+  } else if (!passwordRegex.test(password)) {
+    errors.push('密码必须包含大小写字母、数字和特殊字符(@$!%*?&)');
   }
 
   if (!role || !Object.values(UserRole).includes(role)) {
@@ -86,8 +88,10 @@ export const validateUserLogin = async (req: Request, res: Response, next: NextF
     errors.push('请输入有效的邮箱地址');
   }
 
-  if (!password || password.length < 6) {
-    errors.push('密码至少需要6个字符');
+  if (!password || password.length < 8) {
+    errors.push('密码至少需要8个字符，且包含大小写字母、数字和特殊字符');
+  } else if (!passwordRegex.test(password)) {
+    errors.push('密码必须包含大小写字母、数字和特殊字符(@$!%*?&)');
   }
 
   if (errors.length > 0) {

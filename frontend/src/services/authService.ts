@@ -50,7 +50,7 @@ export interface AuthResponse {
 
 // 创建axios实例
 export const api = axios.create({
-    baseURL: 'http://localhost:57214',
+    baseURL: '/api',  // 使用相对路径，通过 Vite 代理转发到后端
     timeout: 10000,
     headers: {
       'Content-Type': 'application/json',

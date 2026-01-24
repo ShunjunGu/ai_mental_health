@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 // 导入模型训练函数，但不立即执行
 import { trainModel } from './services/emotionRecognitionService';
 import { errorHandler } from './middlewares/validation';
+import { generalLimiter, apiLimiter } from './middlewares/rateLimit';
 
 // 加载环境变量
 dotenv.config();
@@ -25,8 +26,15 @@ const PORT = parseInt(process.env.PORT || '57215', 10); // 确保PORT是数字�
 
 // 中间件配置
 app.use(helmet());
-app.use(cors());
-app.use(morgan('dev'));
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  credentials: true
+}));
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+
+// 应用速率限制
+app.use('/api/', apiLimiter);
+app.use(generalLimiter);
 
 // 设置编码处理，确保正确解析中文
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
